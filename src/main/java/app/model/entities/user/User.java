@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,9 +33,9 @@ public class User {
     private LocalDateTime createdOn;
     private LocalDateTime updatedOn;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Transaction> transactions;
+    private List<Transaction> transactions = new ArrayList<>();
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<Budget> budgets;
+    private List<Budget> budgets = new ArrayList<>();
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<SavingGoal> saving;
+    private List<SavingGoal> saving = new ArrayList<>();
 }
