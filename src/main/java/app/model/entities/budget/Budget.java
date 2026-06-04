@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.UUID;
 
 @Builder
@@ -22,8 +22,8 @@ public class Budget {
     private UUID id;
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal monthlyLimit;
-    private LocalDateTime month;
-    private LocalDateTime year;
+    private Month month;
+    private int year;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
