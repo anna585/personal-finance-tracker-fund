@@ -1,0 +1,66 @@
+body{
+    font-family: Arial, sans-serif;
+    background:#f5f7fb;
+    margin:0;
+}
+
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    padding:20px 50px;
+    background:white;
+}
+
+.nav-links{
+    display:flex;
+    gap:20px;
+}
+
+.nav-links a{
+    text-decoration:none;
+}
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:30px 60px;
+}
+
+.add-btn{
+    background:#27ae60;
+    color:white;
+    padding:12px 20px;
+    text-decoration:none;
+    border-radius:8px;
+}
+
+.transactions-table{
+    padding:20px 60px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+th, td{
+    padding:15px;
+}
+
+thead{
+    background:#3498db;
+    color:white;
+}
+
+.income{
+    color:#27ae60;
+    font-weight:bold;
+}
+
+.expense{
+    color:#e74c3c;
+    font-weight:bold;
+}
