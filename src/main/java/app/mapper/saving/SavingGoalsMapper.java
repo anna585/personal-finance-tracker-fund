@@ -16,7 +16,10 @@ public class SavingGoalsMapper {
         return SavingGoalsDto.builder()
                 .id(savingGoal.getId())
                 .user(savingGoal.getUser())
-                .goalType(savingGoal.getGoalType())
+                .name(savingGoal.getName())
+                .targetAmount(savingGoal.getTargetAmount())
+                .currentAmount(savingGoal.getCurrentAmount())
+                .targetDate(savingGoal.getTargetDate())
                 .build();
     }
 }

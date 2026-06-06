@@ -1,10 +1,11 @@
 package app.model.dto.saving;
 
-import app.model.entities.saving.SavingType;
 import app.model.entities.user.User;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Builder
@@ -12,6 +13,9 @@ import java.util.UUID;
 public class SavingGoalsDto {
 
     private UUID id;
-    private SavingType goalType;
+    private String name;
+    private BigDecimal targetAmount;
+    private BigDecimal currentAmount;
+    private LocalDate targetDate;
     private User user;
 }
