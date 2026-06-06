@@ -47,11 +47,13 @@ public class UserService {
 
         User userEntity = UserMapper.toUserEntity(userRegisterRequest);
 
+        userEntity = userRepository.save(userEntity);
+
         Budget defaultBudget =  budgetService.createDefaultBudget(userEntity);
         userEntity.setBudgets(List.of(defaultBudget));
 
         SavingGoal defaultSavingGoal =  savingService.createDefaultSaving(userEntity);
-        userEntity.setSaving(List.of(defaultSavingGoal));
+        userEntity.setSavingGoals(List.of(defaultSavingGoal));
 
         Transaction defaultTransaction= transactionService.createDefaultTransaction(userEntity);
         userEntity.setTransactions(List.of(defaultTransaction));

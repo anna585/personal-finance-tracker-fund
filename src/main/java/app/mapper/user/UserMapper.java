@@ -50,7 +50,7 @@ public class UserMapper {
                 .map(BudgetMapper::toDto)
                 .toList();
 
-        List<SavingGoalsDto> savingGoalsDtoList = user.getSaving()
+        List<SavingGoalsDto> savingGoalsDtoList = user.getSavingGoals()
                 .stream()
                 .map(SavingGoalsMapper::toDto)
                 .toList();
