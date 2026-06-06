@@ -22,7 +22,9 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private BigDecimal amount;
-    private String description;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
     private LocalDateTime date;
     @ManyToOne
     @JoinColumn(name = "user_id")

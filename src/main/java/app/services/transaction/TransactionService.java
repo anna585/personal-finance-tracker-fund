@@ -22,7 +22,6 @@ public class TransactionService {
         Transaction transaction = Transaction.builder()
                 .user(user)
                 .amount(BigDecimal.valueOf(0.00))
-                .description("")
                 .date(LocalDateTime.now())
                 .build();
 

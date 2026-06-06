@@ -1,6 +1,7 @@
 package app.model.dto.transaction;
 
 import app.model.entities.category.Category;
+import app.model.entities.transaction.TransactionType;
 import app.model.entities.user.User;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,7 @@ public class TransactionDto {
 
     private UUID id;
     private BigDecimal amount;
-    private String description;
+    private TransactionType type;
     private LocalDateTime date;
     private User user;
     private Category category;
