@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Income Transaction | FinanceTracker</title>
+    <link rel="stylesheet" href="/css/add-transaction.css">
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <h2>FinanceTracker</h2>
+
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/transactions">Transactions</a>
+            <a href="/budget">Budget</a>
+            <a href="/profile">Profile</a>
+        </div>
+    </nav>
+</header>
+
+<main>
+
+    <div class="form-container">
+
+        <div class="form-card">
+
+            <h1>Add Income Transaction</h1>
+
+            <form th:action="@{/transactions/add/income}" th:object="${incomeTransactionRequest}" th:method="post">
+
+                <div class="form-group">
+                    <label>Amount</label>
+                    <input type="number"
+                           name="amount"
+                           placeholder="Enter amount"
+                           th:field="*{incomeAmount}">
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+
+                    <select th:field="*{incomeCategory}">
+                        <option value="">Select category</option>
+                        <option th:each="categoryType : ${T(app.model.entities.category.CategoryType).values()}"
+                                th:value="${categoryType}"
+                                th:text="${categoryType}">
+                        </option>
+                    </select>
+                </div>
+
+                <button type="submit" class="save-btn">
+                    Save Transaction
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>
