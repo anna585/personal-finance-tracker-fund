@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Saving Goal | FinanceTracker</title>
+    <link rel="stylesheet" href="/css/add-transaction.css">
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <h2>FinanceTracker</h2>
+
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/transactions">Transactions</a>
+            <a href="/budget">Budget</a>
+            <a href="/savings">Savings</a>
+        </div>
+    </nav>
+</header>
+
+<main>
+
+    <div class="form-container">
+
+        <div class="form-card">
+
+            <h1>Add Saving Goal</h1>
+
+            <form th:action="@{/savings/add}" th:object="${savingRequest}" th:method="post">
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <input placeholder="Enter description"
+                           type="text"
+                           th:field="*{goalName}">
+                    <p class="alert-warning" th:if="${#fields.hasErrors('goalName')}" th:errors="*{goalName}"></p>
+                </div>
+
+                <div class="form-group">
+                    <label>Target amount</label>
+
+                    <input placeholder="Enter target amount"
+                           type="number"
+                           th:field="*{targetAmount}">
+                    <p class="alert-warning" th:if="${#fields.hasErrors('targetAmount')}" th:errors="*{targetAmount}"></p>
+                </div>
+
+                <div class="form-group">
+                    <label>Current amount</label>
+
+                    <input placeholder="Enter target amount"
+                           type="number"
+                           th:field="*{currentAmount}">
+                    <p class="alert-warning" th:if="${#fields.hasErrors('currentAmount')}" th:errors="*{currentAmount}"></p>
+                </div>
+
+                <div class="form-group">
+                    <label>Target date</label>
+                    <input type="date"
+                           name="transactionDate"
+                           th:field="*{targetDate}" >
+                    <p class="alert-warning" th:if="${#fields.hasErrors('targetDate')}" th:errors="*{targetDate}">
+                    </p>
+                </div>
+
+                <button type="submit" class="save-btn">
+                    Save Transaction
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>
