@@ -1,0 +1,63 @@
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f5f7fb;
+}
+
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    padding:20px 50px;
+    background:white;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.nav-links{
+    display:flex;
+    gap:20px;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:#2c3e50;
+    font-weight:bold;
+}
+
+.page-header{
+    padding:30px 50px;
+}
+
+.users-table{
+    padding:0 50px 50px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:15px;
+    overflow:hidden;
+}
+
+thead{
+    background:#3498db;
+    color:white;
+}
+
+th,td{
+    padding:15px;
+    text-align:left;
+}
+
+tr:nth-child(even){
+    background:#f7f7f7;
+}
+
+.delete-btn{
+    background:#e74c3c;
+    color:white;
+    border:none;
+    padding:8px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
