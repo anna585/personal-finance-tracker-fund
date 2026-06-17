@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reports | FinanceTracker</title>
+    <link rel="stylesheet" th:href="@{/css/reports.css}">
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <h2>FinanceTracker Admin</h2>
+
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/admin/users">Users</a>
+            <a href="/admin/reports">Reports</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+</header>
+
+<main>
+
+    <section class="page-header">
+        <h1>System Reports</h1>
+    </section>
+
+    <section class="report-cards">
+
+        <div class="card">
+            <h3>Total Users</h3>
+            <span th:text="*{totalUser}"></span>
+        </div>
+
+        <div class="card">
+            <h3>Total Transactions</h3>
+            <span th:text="*{totalTransactions}"></span>
+        </div>
+
+        <div class="card">
+            <h3>Total Budgets</h3>
+            <span th:text="*{totalBudgets}"></span>
+        </div>
+
+        <div class="card">
+            <h3>Saving Goals</h3>
+            <span th:text="*{totalSavingGoals}"></span>
+        </div>
+
+    </section>
+
+    <section class="report-table">
+
+        <h2>Latest Registered Users</h2>
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Created On</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:each="user : ${users}">
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${#temporals.format(user.createdOn, 'yyyy-MM-dd')}"></td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </section>
+
+</main>
+
+</body>
+</html>
