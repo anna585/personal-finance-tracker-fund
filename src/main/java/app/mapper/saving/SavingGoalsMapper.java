@@ -1,5 +1,6 @@
 package app.mapper.saving;
 
+import app.mapper.user.UserMapper;
 import app.model.dto.saving.SavingGoalsDto;
 import app.model.entities.saving.SavingGoal;
 import lombok.NoArgsConstructor;
@@ -15,8 +16,7 @@ public class SavingGoalsMapper {
         }
         return SavingGoalsDto.builder()
                 .id(savingGoal.getId())
-                .user(savingGoal.getUser())
-                .name(savingGoal.getName())
+                .goalName(savingGoal.getGoalName())
                 .targetAmount(savingGoal.getTargetAmount())
                 .currentAmount(savingGoal.getCurrentAmount())
                 .targetDate(savingGoal.getTargetDate())
