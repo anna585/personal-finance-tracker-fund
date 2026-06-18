@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Add Income Transaction | FinanceTracker</title>
@@ -13,9 +13,12 @@
 
         <div class="nav-links">
             <a href="/dashboard">Dashboard</a>
-            <a href="/transactions">Transactions</a>
             <a href="/budget">Budget</a>
-            <a href="/profile">Profile</a>
+            <a href="/savings">Savings</a>
+            <a href="/transactions">Transactions</a>
+            <a href="/admin/users">Users</a>
+            <a href="/admin/reports">Reports</a>
+            <a href="/logout" class="logout-btn">Logout</a>
         </div>
     </nav>
 </header>
@@ -36,6 +39,7 @@
                            name="amount"
                            placeholder="Enter amount"
                            th:field="*{incomeAmount}">
+                    <p class="alert-warning" th:if="${#fields.hasErrors('incomeAmount')}" th:errors="*{incomeAmount}"></p>
                 </div>
 
                 <div class="form-group">
@@ -43,7 +47,7 @@
 
                     <select th:field="*{incomeCategory}">
                         <option value="">Select category</option>
-                        <option th:each="categoryType : ${T(app.model.entities.category.CategoryType).values()}"
+                        <option th:each="categoryType : ${T(app.model.entities.transaction.CategoryType).values()}"
                                 th:value="${categoryType}"
                                 th:text="${categoryType}">
                         </option>

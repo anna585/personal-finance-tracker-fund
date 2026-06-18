@@ -13,9 +13,12 @@
 
         <div class="nav-links">
             <a href="/dashboard">Dashboard</a>
-            <a href="/transactions">Transactions</a>
             <a href="/budget">Budget</a>
             <a href="/savings">Savings</a>
+            <a href="/transactions">Transactions</a>
+            <a href="/admin/users">Users</a>
+            <a href="/admin/reports">Reports</a>
+            <a href="/logout" class="logout-btn">Logout</a>
         </div>
     </nav>
 </header>
@@ -33,38 +36,29 @@
     <section class="goals-container" >
 
         <div class="goal-card"
-             th:each="goal : ${user.saving}">
+             th:each="goal : ${user.savingGoals}">
 
             <h3 th:text="*{goal.goalName}">
-                Vacation Fund
             </h3>
 
             <div class="goal-info">
                 <span>Target:</span>
                 <strong th:text="*{goal.targetAmount}">
-                    5000
                 </strong>
             </div>
 
             <div class="goal-info">
                 <span>Saved:</span>
                 <strong th:text="*{goal.currentAmount}">
-                    1200
                 </strong>
             </div>
 
-<!--            <div class="progress-container">-->
-<!--                <div class="progress-bar"-->
-<!--                     th:style="'width:' + ${goal.progress} + '%'">-->
-<!--                </div>-->
-<!--            </div>-->
+            <div class="goal-info">
+                <span>Target Date:</span>
+                <strong th:text="${#temporals.format(goal.targetDate, 'dd/MM/yyyy')}">
+                </strong>
+            </div>
 
-<!--            <p class="progress-text">-->
-<!--                <span th:text="${goal.progress}">-->
-<!--                    24-->
-<!--                </span>%-->
-<!--                completed-->
-<!--            </p>-->
 
             <div class="goal-actions">
 
@@ -73,9 +67,12 @@
                     Edit
                 </a>
 
-                <a th:href="@{/savings/{id}/delete(id=${goal.id})}"
-                   class="btn-delete">
-                    Delete
+                <a>
+                        <form  th:action="@{/savings/{id}/delete(id=${goal.id})}" th:method="post">
+                            <button type="submit" class="btn-delete">
+                                Delete
+                            </button>
+                        </form>
                 </a>
 
             </div>

@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Transactions</title>
+    <title>Transactions | FinanceTracker</title>
     <link rel="stylesheet" href="/css/transactions.css">
 
 </head>
@@ -14,9 +14,12 @@
 
         <div class="nav-links">
             <a href="/dashboard">Dashboard</a>
-            <a href="/transactions">Transactions</a>
             <a href="/budget">Budget</a>
-            <a href="/profile">Profile</a>
+            <a href="/savings">Savings</a>
+            <a href="/transactions">Transactions</a>
+            <a href="/admin/users">Users</a>
+            <a href="/admin/reports">Reports</a>
+            <a href="/logout" class="logout-btn">Logout</a>
         </div>
     </nav>
 </header>
@@ -37,7 +40,6 @@
             <thead>
             <tr>
                 <th>Date</th>
-                <th>Description</th>
                 <th>Category</th>
                 <th>Type</th>
                 <th>Amount</th>
@@ -47,31 +49,25 @@
 
             <tbody>
 
-            <tr>
-                <td>05/06/2026</td>
-                <td>Salary</td>
-                <td>Income</td>
-                <td>Income</td>
-                <td class="income">+ ₺8500</td>
-
+            <tr th:each="transaction : ${user.transactions}">
+                <td th:text="${#temporals.format(transaction.date, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${transaction.categoryType}"></td>
+                <td th:text="${transaction.type}"></td>
                 <td>
-                    <a href="#">Edit</a>
-                    <a href="#">Delete</a>
+                    <p th:if="${transaction.type.name() == 'INCOME'}" class="income" th:text="'+ ' + ${transaction.amount} + ' €'"></p>
+                    <p th:if="${transaction.type.name() == 'EXPENSE'}" class="expense" th:text="'- ' + ${transaction.amount} + ' €'"></p>
                 </td>
+
+                <td>   <form th:action="@{/transactions/{id}/delete(id=${transaction.id})}"
+                             method="post">
+                    <button type="submit" class="delete-btn">
+                        Delete
+                    </button>
+                </form></td>
+
+
             </tr>
 
-            <tr>
-                <td>04/06/2026</td>
-                <td>Rent</td>
-                <td>Housing</td>
-                <td>Expense</td>
-                <td class="expense">- ₺2000</td>
-
-                <td>
-                    <a href="#">Edit</a>
-                    <a href="#">Delete</a>
-                </td>
-            </tr>
 
             </tbody>
 
