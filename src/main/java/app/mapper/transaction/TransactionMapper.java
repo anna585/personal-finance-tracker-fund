@@ -1,5 +1,6 @@
 package app.mapper.transaction;
 
+import app.mapper.user.UserMapper;
 import app.model.dto.transaction.TransactionDto;
 import app.model.entities.transaction.Transaction;
 import lombok.NoArgsConstructor;
@@ -16,12 +17,12 @@ public class TransactionMapper {
 
         return TransactionDto.builder()
                 .id(transaction.getId())
-                .user(transaction.getUser())
                 .amount(transaction.getAmount())
                 .type(transaction.getType())
                 .date(transaction.getDate())
-                .category(transaction.getCategory())
+                .category(transaction.getCategoryType())
                 .build();
 
     }
+
 }
