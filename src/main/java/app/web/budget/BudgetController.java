@@ -27,49 +27,64 @@ public class BudgetController {
     private final BudgetService budgetService;
     private final TransactionService transactionService;
 
-    public BudgetController(UserService userService, BudgetService budgetService, TransactionService transactionService) {
+    public BudgetController(UserService userService,
+                            BudgetService budgetService,
+                            TransactionService transactionService) {
         this.userService = userService;
         this.budgetService = budgetService;
         this.transactionService = transactionService;
     }
 
-    @GetMapping
-    public ModelAndView getMonthlyBudgetRequest(HttpSession httpSession){
+    public ModelAndView populateBudgetPage(ModelAndView modelAndView,
+                                           MonthlyBudgetRequest monthlyBudgetRequest,
+                                           User user,
+                                           UUID userId){
 
-        MonthlyBudgetRequest monthlyBudgetRequest = MonthlyBudgetRequest.builder().build();
-
-        UUID userId = (UUID) httpSession.getAttribute("user_id");
-        User user = userService.getEntityById(userId);
         BudgetDto budget = budgetService.getCurrentBudget(user);
 
+        if(budget == null){
+            throw new RuntimeException("Please enter monthly budget!");
+        }
+
         BigDecimal spent = transactionService.getTotalSpentByUser(userId);
+        BigDecimal remaining = budgetService.calculateRemainingBudget(user);
 
-        BigDecimal remaining =budget.getMonthlyLimit().subtract(spent);
-
-        return new ModelAndView("budget")
+        return modelAndView
                 .addObject("monthlyBudgetRequest", monthlyBudgetRequest)
                 .addObject("budget", budget)
                 .addObject("user", user)
                 .addObject("spent", spent)
                 .addObject("remaining", remaining);
+
+    }
+
+    @GetMapping
+    public ModelAndView getMonthlyBudgetRequest(HttpSession httpSession){
+
+        User user = userService.getCurrentUser(httpSession);
+
+       return populateBudgetPage(new ModelAndView("budget"),
+               MonthlyBudgetRequest.builder().build(),
+               user,
+               user.getId());
     }
 
     @PostMapping
     public ModelAndView postMonthlyBudgetRequest(@Valid @ModelAttribute MonthlyBudgetRequest monthlyBudgetRequest,
                                                  BindingResult bindingResult,
                                                  HttpSession httpSession){
+    User user = userService.getCurrentUser(httpSession);
+
 
         if(bindingResult.hasErrors()){
-            ModelAndView modelAndView = new ModelAndView();
-            modelAndView.setViewName("budget");
-            return modelAndView;
+
+            return populateBudgetPage(new ModelAndView("budget"),
+                    monthlyBudgetRequest,
+                    user,
+                    user.getId());
         }
 
-        UUID userId = (UUID) httpSession.getAttribute("user_id");
-        User user = userService.getEntityById(userId);
-
         budgetService.updateMonthlyBudget(user,monthlyBudgetRequest);
-
         return new ModelAndView("redirect:/budget");
     }
 

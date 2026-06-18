@@ -1,16 +1,15 @@
 package app.web.savings;
 
+import app.model.dto.saving.SavingGoalsDto;
 import app.model.dto.saving.SavingRequest;
-import app.model.dto.user.UserDto;
+import app.model.entities.user.User;
+import app.services.saving.SavingService;
 import app.services.user.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.UUID;
@@ -20,60 +19,73 @@ import java.util.UUID;
 public class SavingController {
 
     private final UserService userService;
+    private final SavingService savingService;
 
 
-    public SavingController(UserService userService) {
+    public SavingController(UserService userService,
+                            SavingService savingService) {
         this.userService = userService;
+        this.savingService = savingService;
     }
 
+    public ModelAndView populateSavingGoals(ModelAndView modelAndView,
+                                            SavingRequest savingRequest,
+                                            User user){
+
+        return modelAndView
+                .addObject("user", user)
+                .addObject("savingRequest", savingRequest);
+
+    }
 
     @GetMapping
     public ModelAndView savingsGoals(HttpSession httpSession) {
 
-        UUID userId = (UUID) httpSession.getAttribute("user_id");
-        UserDto user = userService.getById(userId);
-        SavingRequest savingRequest = SavingRequest.builder().build();
+        User user = userService.getCurrentUser(httpSession);
 
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("savings");
-        modelAndView.addObject("user", user);
-        modelAndView.addObject("savingRequest", savingRequest);
-
-        return modelAndView;
+        return populateSavingGoals(new ModelAndView("savings"),
+        SavingRequest.builder().build(),
+        user);
 
     }
 
     @GetMapping("/add")
     public ModelAndView getAddingGoals(HttpSession httpSession){
 
-        UUID userId = (UUID) httpSession.getAttribute("user_id");
-        UserDto user = userService.getById(userId);
-        SavingRequest savingRequest = SavingRequest.builder().build();
+        User user = userService.getCurrentUser(httpSession);
 
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("add-savings");
-        modelAndView.addObject("user", user);
-        modelAndView.addObject("savingRequest", savingRequest);
-
-        return modelAndView;
+        return populateSavingGoals(new ModelAndView("add-savings"),
+                SavingRequest.builder().build(),
+                user);
     }
 
     @PostMapping("/add")
     public ModelAndView postAddingGoals(@Valid @ModelAttribute SavingRequest savingRequest,
-                                        HttpSession httpSession,
-                                        BindingResult bindingResult){
+                                        BindingResult bindingResult,
+                                        HttpSession httpSession){
+
+        User user = userService.getCurrentUser(httpSession);
 
         if(bindingResult.hasErrors()){
-            ModelAndView modelAndView = new ModelAndView();
-            modelAndView.setViewName("add-savings");
-
-            return modelAndView;
+            return populateSavingGoals(new ModelAndView("add-savings"),
+                    savingRequest,
+                    user);
         }
 
-        UUID userId = (UUID) httpSession.getAttribute("user_id");
+        savingService.createGoals(user.getId(), savingRequest);
+        return new ModelAndView("redirect:/savings");
+    }
 
-        userService.createGoals(userId, savingRequest);
+    @PostMapping("/{id}/delete")
+    public ModelAndView deleteSavingGoal(@PathVariable UUID id, HttpSession httpSession){
 
+        SavingGoalsDto savingGoal = savingService.getSavingGoalById(id);
+
+        if(savingGoal == null){
+            throw new RuntimeException("The Saving goal is not found!");
+        }
+
+        savingService.deleteSavingGoal(id);
         return new ModelAndView("redirect:/savings");
 
     }

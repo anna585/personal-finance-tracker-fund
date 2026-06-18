@@ -1,18 +1,16 @@
 package app.web.transaction;
 
-import app.model.dto.transaction.ExpenseTransaction;
+import app.model.dto.transaction.ExpenseTransactionRequest;
 import app.model.dto.transaction.IncomeTransactionRequest;
 import app.model.dto.transaction.TransactionRequest;
-import app.model.dto.user.UserDto;
+import app.model.entities.user.User;
+import app.services.transaction.TransactionService;
 import app.services.user.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.UUID;
@@ -22,55 +20,59 @@ import java.util.UUID;
 public class TransactionController {
 
     private final UserService userService;
+    private final TransactionService transactionService;
 
-    public TransactionController(UserService userService) {
+    public TransactionController(UserService userService,
+                                 TransactionService transactionService) {
 
         this.userService = userService;
+        this.transactionService = transactionService;
+    }
+
+    public ModelAndView populateTransaction(ModelAndView modelAndView,
+                                            TransactionRequest transactionRequest,
+                                            User user){
+
+        return modelAndView
+                .addObject("user", user)
+                .addObject("transactionRequest", transactionRequest);
+
     }
 
     @GetMapping
     public ModelAndView getTransactions(HttpSession httpSession){
 
-        UUID userId = (UUID) httpSession.getAttribute("user_id");
-        UserDto user = userService.getById(userId);
+        User user = userService.getCurrentUser(httpSession);
 
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("transactions");
-        modelAndView.addObject("user", user);
-
-        return modelAndView;
+        return populateTransaction(new ModelAndView("transactions"),
+                TransactionRequest.builder().build(),
+                user);
     }
 
     @GetMapping("/add")
     public ModelAndView addTransaction(HttpSession httpSession){
 
-        UUID userId = (UUID) httpSession.getAttribute("user_id");
-        UserDto user = userService.getById(userId);
-        TransactionRequest transactionRequest = TransactionRequest.builder().build();
+        User user = userService.getCurrentUser(httpSession);
 
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("add-transaction");
-        modelAndView.addObject("user", user);
-        modelAndView.addObject("transactionRequest", transactionRequest);
-
-        return modelAndView;
+        return populateTransaction(new ModelAndView("add-transaction"),
+                TransactionRequest.builder().build(),
+                user);
     }
 
     @PostMapping("/add")
     public ModelAndView postTransaction(@Valid @ModelAttribute TransactionRequest transactionRequest,
                                         BindingResult bindingResult,
                                         HttpSession httpSession){
-        UUID id = (UUID) httpSession.getAttribute("user_id");
-        UserDto user = userService.getById(id);
+        User user = userService.getCurrentUser(httpSession);
+
         if(bindingResult.hasErrors()){
 
-            ModelAndView modelAndView = new ModelAndView();
-            modelAndView.setViewName("add-transaction");
-            modelAndView.addObject("user", user);
-            return modelAndView;
+            return populateTransaction(new ModelAndView("add-transaction"),
+                    TransactionRequest.builder().build(),
+                    user);
         }
 
-        userService.createNewTransaction(id, transactionRequest);
+        transactionService.createNewTransaction(user.getId(), transactionRequest);
 
         return new ModelAndView("redirect:/transactions");
     }
@@ -78,76 +80,68 @@ public class TransactionController {
     @GetMapping("add/income")
     public ModelAndView getIncomeTransaction(HttpSession httpSession){
 
-        UUID userId = (UUID) httpSession.getAttribute("user_id");
-        UserDto user = userService.getById(userId);
+        User user = userService.getCurrentUser(httpSession);
+
         IncomeTransactionRequest incomeTransactionRequest = IncomeTransactionRequest.builder().build();
 
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("add-income-transaction");
-        modelAndView.addObject("user", user);
-        modelAndView.addObject("incomeTransactionRequest", incomeTransactionRequest);
-
-
-        return modelAndView;
+        return new ModelAndView("add-income-transaction")
+                .addObject("user", user)
+                .addObject("incomeTransactionRequest", incomeTransactionRequest);
     }
 
     @PostMapping("/add/income")
     public ModelAndView postIncomeTransaction(@Valid @ModelAttribute IncomeTransactionRequest incomeTransactionRequest,
                                         BindingResult bindingResult,
                                         HttpSession httpSession){
-        UUID id = (UUID) httpSession.getAttribute("user_id");
-        UserDto user = userService.getById(id);
+        User user = userService.getCurrentUser(httpSession);
 
         if(bindingResult.hasErrors()){
 
-            ModelAndView modelAndView = new ModelAndView();
-            modelAndView.setViewName("add-income-transaction");
-            modelAndView.addObject("user", user);
-
-            return modelAndView;
+            return new ModelAndView("add-income-transaction")
+                    .addObject("user", user)
+                    .addObject("incomeTransactionRequest", incomeTransactionRequest);
         }
 
-        userService.createIncomeTransaction(id, incomeTransactionRequest);
-
+        transactionService.createIncomeTransaction(user.getId(), incomeTransactionRequest);
         return new ModelAndView("redirect:/transactions");
     }
 
     @GetMapping("add/expense")
     public ModelAndView getExpenseTransaction(HttpSession httpSession){
 
-        UUID userId = (UUID) httpSession.getAttribute("user_id");
-        UserDto user = userService.getById(userId);
-        ExpenseTransaction expenseTransaction = ExpenseTransaction.builder().build();
+        User user = userService.getCurrentUser(httpSession);
 
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("add-expense-transaction");
-        modelAndView.addObject("user", user);
-        modelAndView.addObject("expenseTransaction", expenseTransaction);
+        ExpenseTransactionRequest expenseTransactionRequest = ExpenseTransactionRequest.builder().build();
 
-
-        return modelAndView;
+        return new ModelAndView("add-expense-transaction")
+                .addObject("user", user)
+                .addObject("expenseTransactionRequest", expenseTransactionRequest);
     }
 
     @PostMapping("/add/expense")
-    public ModelAndView postExpenseTransaction(@Valid @ModelAttribute ExpenseTransaction expenseTransaction,
+    public ModelAndView postExpenseTransaction(@Valid @ModelAttribute ExpenseTransactionRequest expenseTransactionRequest,
                                               BindingResult bindingResult,
                                               HttpSession httpSession){
 
-        UUID id = (UUID) httpSession.getAttribute("user_id");
-        UserDto user = userService.getById(id);
+        User user = userService.getCurrentUser(httpSession);
 
         if(bindingResult.hasErrors()){
 
-            ModelAndView modelAndView = new ModelAndView();
-            modelAndView.setViewName("add-expense-transaction");
-            modelAndView.addObject("user", user);
-
-            return modelAndView;
+            return new ModelAndView("add-expense-transaction")
+                    .addObject("user", user)
+                    .addObject("expenseTransactionRequest", expenseTransactionRequest);
         }
 
-        userService.createExpenseTransaction(id, expenseTransaction);
+        transactionService.createExpenseTransaction(user.getId(), expenseTransactionRequest);
 
         return new ModelAndView("redirect:/transactions");
     }
 
+    @PostMapping("/{id}/delete")
+    public ModelAndView deleteTransaction(@PathVariable UUID id){
+
+        transactionService.deleteTransaction(id);
+        return new ModelAndView("redirect:/transactions");
+
+    }
 }
