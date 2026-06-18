@@ -27,15 +27,18 @@ public class User {
     private String username;
     private String firstName;
     private String lastName;
-    @Column(unique = true)
     private String email;
     private String password;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole userRole;
     private LocalDateTime createdOn;
     private LocalDateTime updatedOn;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    @OrderBy("date DESC")
     private List<Transaction> transactions = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private List<Budget> budgets = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<SavingGoal> saving = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    private List<SavingGoal> savingGoals = new ArrayList<>();
 }

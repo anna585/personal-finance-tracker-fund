@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 @Data
 public class MonthlyBudgetRequest {
 
-    @Positive
-    @NotNull
+    @NotNull(message = "Amount is required")
+    @Positive(message = "Amount must be greater than 0")
     private BigDecimal monthlyBudget;
     private BigDecimal spent;
     private BigDecimal remaining;

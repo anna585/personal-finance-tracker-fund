@@ -1,7 +1,6 @@
 package app.model.entities.transaction;
 
 import app.model.entities.user.User;
-import app.model.entities.category.Category;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,12 +24,11 @@ public class Transaction {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private TransactionType type;
+    @Enumerated(EnumType.STRING)
+    private CategoryType categoryType;
     private LocalDateTime date;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
 
 }
