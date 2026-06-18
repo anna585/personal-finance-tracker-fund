@@ -3,6 +3,7 @@ package app.model.dto.user;
 import app.model.dto.budget.BudgetDto;
 import app.model.dto.saving.SavingGoalsDto;
 import app.model.dto.transaction.TransactionDto;
+import app.model.entities.user.UserRole;
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class UserDto {
     private String lastName;
     private String email;
     private String password;
+    private UserRole userRole;
     private LocalDateTime createdOn;
     private LocalDateTime updatedOn;
     private List<TransactionDto> transactions;
