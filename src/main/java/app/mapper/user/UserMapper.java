@@ -29,6 +29,7 @@ public class UserMapper {
                 .firstName(userRegisterRequest.getFirstName())
                 .lastName(userRegisterRequest.getLastName())
                 .email(userRegisterRequest.getEmail())
+                .userRole(userRegisterRequest.getUserRole())
                 .createdOn(LocalDateTime.now())
                 .updatedOn(LocalDateTime.now())
                 .build();
@@ -61,6 +62,7 @@ public class UserMapper {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
+                .userRole(user.getUserRole())
                 .createdOn(user.getCreatedOn())
                 .updatedOn(user.getUpdatedOn())
                 .transactions(transactionDtoList)
