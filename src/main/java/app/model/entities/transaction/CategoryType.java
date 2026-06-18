@@ -1,12 +1,15 @@
-package app.model.entities.category;
+package app.model.entities.transaction;
 
 public enum CategoryType {
     FOOD,
     TRANSPORT,
-    SALARY,
     SHOPPING,
     BILLS,
     HEALTH,
     EDUCATION,
+    SALARY,
+    SAVING,
+    BONUS,
+    RETURN_AMOUNT,
     OTHER
 }
