@@ -28,12 +28,16 @@ body{
     padding:30px 60px;
 }
 
-.add-btn{
+.add-btn, .delete-btn{
     background:#27ae60;
     color:white;
     padding:12px 20px;
     text-decoration:none;
     border-radius:8px;
+}
+
+.delete-btn{
+    background: #ef4444;
 }
 
 .transactions-table{
@@ -47,6 +51,7 @@ table{
 }
 
 th, td{
+    text-align: left;
     padding:15px;
 }
 
