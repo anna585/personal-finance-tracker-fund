@@ -1,5 +1,6 @@
 package app.mapper.budget;
 
+import app.mapper.user.UserMapper;
 import app.model.dto.budget.BudgetDto;
 import app.model.entities.budget.Budget;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,6 @@ public class BudgetMapper {
 
         return BudgetDto.builder()
                 .id(budget.getId())
-                .user(budget.getUser())
                 .monthlyLimit(budget.getMonthlyLimit())
                 .month(budget.getMonth())
                 .year(budget.getYear())
