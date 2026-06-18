@@ -1,6 +1,7 @@
 package app.model.dto.saving;
 
-import app.model.entities.user.User;
+import app.model.dto.user.UserDto;
+import app.model.entities.transaction.CategoryType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,9 +14,9 @@ import java.util.UUID;
 public class SavingGoalsDto {
 
     private UUID id;
-    private String name;
+    private String goalName;
     private BigDecimal targetAmount;
     private BigDecimal currentAmount;
     private LocalDate targetDate;
-    private User user;
+    private CategoryType category;
 }
