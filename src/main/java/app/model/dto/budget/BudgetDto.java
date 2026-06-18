@@ -1,6 +1,6 @@
 package app.model.dto.budget;
 
-import app.model.entities.user.User;
+import app.model.dto.user.UserDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,5 +16,4 @@ public class BudgetDto {
     private BigDecimal monthlyLimit;
     private Month month;
     private int year;
-    private User user;
 }
