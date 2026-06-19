@@ -10,6 +10,7 @@ import app.model.entities.transaction.Transaction;
 import app.model.entities.transaction.TransactionType;
 import app.model.entities.user.User;
 import app.repositories.budget.BudgetRepository;
+import app.repositories.saving.SavingRepository;
 import app.repositories.transaction.TransactionRepository;
 
 import app.repositories.user.UserRepository;
@@ -27,13 +28,15 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final BudgetRepository budgetRepository;
     private final UserRepository userRepository;
+    private final SavingRepository savingRepository;
 
     public TransactionService(TransactionRepository transactionRepository,
                               BudgetRepository budgetRepository,
-                              UserRepository userRepository) {
+                              UserRepository userRepository, SavingRepository savingRepository) {
         this.transactionRepository = transactionRepository;
         this.budgetRepository = budgetRepository;
         this.userRepository = userRepository;
+        this.savingRepository = savingRepository;
     }
 
     public UserDto createNewTransaction(UUID id, TransactionRequest transactionRequest) {
@@ -60,9 +63,6 @@ public class TransactionService {
 
         transactionRepository.save(transaction);
 
-//        user.getTransactions().add(transaction);
-//        userRepository.save(user);
-
         return UserMapper.toUserDto(user);
     }
 
@@ -82,9 +82,6 @@ public class TransactionService {
                 .build();
 
         transactionRepository.save(transaction);
-
-//        user.getTransactions().add(transaction);
-//        userRepository.save(user);
 
         return UserMapper.toUserDto(user);
     }
@@ -106,9 +103,6 @@ public class TransactionService {
 
         transactionRepository.save(transaction);
 
-//        user.getTransactions().add(transaction);
-//        userRepository.save(user);
-
         return UserMapper.toUserDto(user);
     }
     public BigDecimal getTotalSpentByUser(UUID userId) {
@@ -116,8 +110,6 @@ public class TransactionService {
        return transactionRepository.getTotalSpentByUser(userId) != null
                ? transactionRepository.getTotalSpentByUser(userId)
                : BigDecimal.ZERO;
-
-
     }
 
     public BigDecimal getTotalIncomeByUser(UUID userId) {
@@ -128,6 +120,9 @@ public class TransactionService {
     }
 
     public void deleteTransaction(UUID id) {
+
+        savingRepository.findByTransactionId(id)
+                .ifPresent(savingRepository::delete);
 
         transactionRepository.deleteById(id);
     }
