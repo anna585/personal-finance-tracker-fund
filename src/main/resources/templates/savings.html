@@ -33,23 +33,27 @@
         </a>
     </section>
 
-    <section class="goals-container" >
+    <section class="goals-container">
+
+        <div th:if="${errorMessage}" class="error">
+            <p th:text="${errorMessage}"></p>
+        </div>
 
         <div class="goal-card"
-             th:each="goal : ${user.savingGoals}">
+             th:each="goal : ${savingGoals}">
 
-            <h3 th:text="*{goal.goalName}">
+            <h3 th:text="${goal.goalName}">
             </h3>
 
             <div class="goal-info">
                 <span>Target:</span>
-                <strong th:text="*{goal.targetAmount}">
+                <strong th:text="${goal.targetAmount}">
                 </strong>
             </div>
 
             <div class="goal-info">
                 <span>Saved:</span>
-                <strong th:text="*{goal.currentAmount}">
+                <strong th:text="${goal.currentAmount}">
                 </strong>
             </div>
 
@@ -67,13 +71,13 @@
                     Edit
                 </a>
 
-                <a>
-                        <form  th:action="@{/savings/{id}/delete(id=${goal.id})}" th:method="post">
-                            <button type="submit" class="btn-delete">
-                                Delete
-                            </button>
-                        </form>
-                </a>
+
+                <form  th:action="@{/savings/{id}/delete(id=${goal.id})}" th:method="post">
+                    <button type="submit" class="btn-delete">
+                        Delete
+                    </button>
+                </form>
+
 
             </div>
 

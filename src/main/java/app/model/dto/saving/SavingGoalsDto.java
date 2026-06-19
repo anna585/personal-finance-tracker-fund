@@ -1,6 +1,5 @@
 package app.model.dto.saving;
 
-import app.model.dto.user.UserDto;
 import app.model.entities.transaction.CategoryType;
 import lombok.Builder;
 import lombok.Data;
