@@ -31,7 +31,8 @@ The project was developed as part of the Spring Fundamentals course.
 ### Saving Goals
 
 * Create saving goals
-* Monitor progress toward financial goals
+* Delete saving goals
+* Edit saving goals
 
 ### Dashboard
 
@@ -124,7 +125,7 @@ Remaining Budget = Monthly Budget − Monthly Expenses
 
 ### Saving Goals
 
-Users can create financial goals.
+Creates a saving financial goal by automatically adding 10% of the remaining monthly budget to the user-entered amount. If the remaining budget is insufficient, an error message is shown.
 
 ### Role Management
 
