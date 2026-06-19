@@ -2,6 +2,7 @@ package app.services.saving;
 
 import app.mapper.saving.SavingGoalsMapper;
 import app.mapper.user.UserMapper;
+import app.model.dto.saving.EditSavingRequest;
 import app.model.dto.saving.SavingGoalsDto;
 import app.model.dto.saving.SavingRequest;
 import app.model.dto.user.UserDto;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -73,9 +75,9 @@ public class SavingService {
         BigDecimal currentAmountAndAutoSave = savingRequest.getCurrentAmount().add(autoSave);
 
         if(remaining.compareTo(autoSave) < 0){
-            throw new RuntimeException("Monthly budget is not enough to create your saving goal!");
+            throw new IllegalArgumentException("Monthly budget is not enough to create your saving goal!");
         } else if (remaining.compareTo(currentAmountAndAutoSave) < 0) {
-            throw new RuntimeException("The amount entered is not available in the monthly budget.");
+            throw new IllegalArgumentException("The amount entered is not available in the monthly budget.");
         }
 
         Transaction transaction = Transaction.builder()
@@ -109,5 +111,30 @@ public class SavingService {
     public Long getCountOfSavingGoals() {
 
         return savingRepository.count();
+    }
+
+    public List<SavingGoal> getAllSavingGoalsByUser(UUID userId) {
+
+        return savingRepository.findAllByUserId(userId);
+    }
+
+    public SavingGoalsDto updateSavingGoals(UUID id, EditSavingRequest editSavingRequest) {
+
+        SavingGoal savingEntity = savingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("SavingGoal with id [%s] does not exist".formatted(id)));
+
+        Transaction transaction = savingEntity.getTransaction();
+
+        transaction.setAmount(editSavingRequest.getCurrentAmount());
+
+
+        savingEntity.setGoalName(editSavingRequest.getGoalName());
+        savingEntity.setTargetAmount(editSavingRequest.getTargetAmount());
+        savingEntity.setCurrentAmount(editSavingRequest.getCurrentAmount());
+        savingEntity.setTargetDate(editSavingRequest.getTargetDate());
+
+        SavingGoal updateSavingGoal = savingRepository.save(savingEntity);
+
+        return SavingGoalsMapper.toDto(updateSavingGoal);
     }
 }

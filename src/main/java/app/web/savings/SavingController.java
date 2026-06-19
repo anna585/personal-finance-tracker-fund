@@ -1,5 +1,6 @@
 package app.web.savings;
 
+import app.model.dto.saving.EditSavingRequest;
 import app.model.dto.saving.SavingGoalsDto;
 import app.model.dto.saving.SavingRequest;
 import app.model.entities.user.User;
@@ -43,9 +44,12 @@ public class SavingController {
 
         User user = userService.getCurrentUser(httpSession);
 
-        return populateSavingGoals(new ModelAndView("savings"),
-        SavingRequest.builder().build(),
-        user);
+        return new ModelAndView("savings")
+                .addObject("user", user)
+                .addObject(
+                        "savingGoals",
+                        savingService.getAllSavingGoalsByUser(user.getId())
+                );
 
     }
 
@@ -72,7 +76,19 @@ public class SavingController {
                     user);
         }
 
-        savingService.createGoals(user.getId(), savingRequest);
+        try {
+            savingService.createGoals(user.getId(), savingRequest);
+
+        } catch (IllegalArgumentException ex) {
+
+            return new ModelAndView("savings")
+                    .addObject("user", user)
+                    .addObject("savingGoals",
+                    savingService.getAllSavingGoalsByUser(user.getId()))
+                    .addObject("errorMessage", ex.getMessage());
+        }
+
+
         return new ModelAndView("redirect:/savings");
     }
 
@@ -88,5 +104,32 @@ public class SavingController {
         savingService.deleteSavingGoal(id);
         return new ModelAndView("redirect:/savings");
 
+    }
+
+    @GetMapping("/{id}/edit")
+    public ModelAndView getEditSavingGoal(@PathVariable UUID id) {
+
+        SavingGoalsDto goal = savingService.getSavingGoalById(id);
+
+        EditSavingRequest editSavingRequest = EditSavingRequest.builder()
+                .goalName(goal.getGoalName())
+                .targetAmount(goal.getTargetAmount())
+                .currentAmount(goal.getCurrentAmount())
+                .targetDate(goal.getTargetDate())
+                .build();
+
+        return new ModelAndView("edit-savings")
+                .addObject("editSavingRequest", editSavingRequest)
+                .addObject("goalId", id);
+    }
+
+    @PostMapping("/{id}/edit")
+    public ModelAndView editSavingGoals(
+            @PathVariable UUID id,
+            @ModelAttribute EditSavingRequest editSavingRequest){
+
+        savingService.updateSavingGoals(id, editSavingRequest);
+
+        return new ModelAndView("redirect:/savings");
     }
 }
