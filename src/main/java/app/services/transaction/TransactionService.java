@@ -40,14 +40,16 @@ public class TransactionService {
     }
 
     public UserDto createNewTransaction(UUID id, TransactionRequest transactionRequest) {
-
-        Budget budget = budgetRepository.findByUserId(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Budget is empty. Please create new budget."));
+        LocalDateTime now = LocalDateTime.now();
 
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("User not found!"));
+
+        Budget budget = budgetRepository.findByUserAndMonthAndYear(user, now.getMonth(), now.getYear())
+                .orElseThrow(() ->
+                        new RuntimeException("Budget is empty. Please create new budget."));
+
 
         if(budget.getMonthlyLimit().compareTo(transactionRequest.getAmount()) < 0 && transactionRequest.getType().equals(TransactionType.EXPENSE)){
             throw new RuntimeException("Transaction is not successful. Please check your budget!");

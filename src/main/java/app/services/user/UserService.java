@@ -54,10 +54,8 @@ public class UserService {
 
         userEntity = userRepository.save(userEntity);
 
-//        Budget defaultBudget =  budgetService.createDefaultBudget(userEntity);
-//        userEntity.setBudgets(new ArrayList<>(List.of(defaultBudget)));
-
-        budgetService.createDefaultBudget(userEntity);
+        Budget defaultBudget =  budgetService.createDefaultBudget(userEntity);
+        userEntity.setBudgets(new ArrayList<>(List.of(defaultBudget)));
 
         userEntity.setSavingGoals(new ArrayList<>());
 

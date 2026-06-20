@@ -59,14 +59,15 @@ public class SavingService {
     }
 
     public UserDto createGoals(UUID userId, @Valid SavingRequest savingRequest) {
-
-        Budget budget = budgetRepository.findByUserId(userId)
-                .orElseThrow(() ->
-                        new RuntimeException("Budget is empty. Please create new budget."));
+        LocalDateTime now = LocalDateTime.now();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
                         new RuntimeException("User not found!"));
+
+        Budget budget = budgetRepository.findByUserAndMonthAndYear(user, now.getMonth(), now.getYear())
+                .orElseThrow(() ->
+                        new RuntimeException("Budget is empty. Please create new budget."));
 
         BigDecimal spent = transactionService.getTotalSpentByUser(userId);
         BigDecimal remaining =budget.getMonthlyLimit().subtract(spent);
