@@ -47,7 +47,7 @@ public class BudgetService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        Optional<Budget> currentBudget = budgetRepository.findBudgetByUserAndMonthAndYear(user, now.getMonth(), now.getYear());
+        Optional<Budget> currentBudget = budgetRepository.findByUserAndMonthAndYear(user, now.getMonth(), now.getYear());
         
 
         Budget budget;
