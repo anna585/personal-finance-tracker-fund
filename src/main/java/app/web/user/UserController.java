@@ -85,7 +85,7 @@ public class UserController {
 
             return new ModelAndView("redirect:/dashboard");
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
 
             return new ModelAndView("login")
                     .addObject("userLoginRequest", userLoginRequest)
