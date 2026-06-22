@@ -40,7 +40,7 @@ public class UserService {
 
         userRepository.findByUsername(userRegisterRequest.getUsername())
                 .ifPresent(user -> {
-                    throw new RuntimeException("User with username already exists!");
+                    throw new RuntimeException("User with username [%s] already exists!".formatted(userRegisterRequest.getUsername()));
                 });
 
       String encodedPassword = passwordEncoder.encode(userRegisterRequest.getPassword());
