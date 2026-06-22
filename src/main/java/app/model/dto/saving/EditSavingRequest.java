@@ -20,7 +20,7 @@ public class EditSavingRequest {
     @Positive(message = "Amount must be greater than 0")
     private BigDecimal targetAmount;
     @NotNull(message = "Amount is required")
-    @PositiveOrZero(message = "Current amount cannot be negative")
+    @Positive(message = "Current amount cannot be negative")
     private BigDecimal currentAmount;
     @NotNull(message = "Target date is required")
     private LocalDate targetDate;

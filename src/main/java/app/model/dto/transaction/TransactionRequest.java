@@ -16,6 +16,8 @@ public class TransactionRequest {
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be greater than 0")
     private BigDecimal amount;
+    @NotNull(message = "Please select an appropriate type of the transaction.")
     private TransactionType type;
+    @NotNull(message = "Please select an appropriate category of the transaction.")
     private CategoryType category;
 }
