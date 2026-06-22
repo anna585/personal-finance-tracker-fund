@@ -110,8 +110,16 @@ public class UserController {
             return new ModelAndView("register");
         }
 
-        userService.register(userRegisterRequest);
-        return new ModelAndView("redirect:/login");
+        try {
+            userService.register(userRegisterRequest);
+            return new ModelAndView("redirect:/login");
+
+        } catch (RuntimeException e) {
+
+            return new ModelAndView("register")
+                    .addObject("userRegisterRequest", userRegisterRequest)
+                    .addObject("error", e.getMessage());
+        }
     }
 
     @GetMapping("/logout")
