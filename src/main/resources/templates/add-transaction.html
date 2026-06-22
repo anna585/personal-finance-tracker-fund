@@ -50,8 +50,10 @@
                        <option th:each="type : ${T(app.model.entities.transaction.TransactionType).values()}"
                                 th:value="${type}"
                                th:text="${type}">
+
                         </option>
                     </select>
+                    <p class="alert-warning" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></p>
                 </div>
 
                 <div class="form-group">
@@ -64,8 +66,8 @@
                                 th:text="${categoryType}">
                         </option>
                     </select>
+                    <p class="alert-warning" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></p>
                 </div>
-
                 <button type="submit" class="save-btn">
                     Save Transaction
                 </button>

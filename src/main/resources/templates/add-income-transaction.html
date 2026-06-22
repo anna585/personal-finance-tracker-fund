@@ -52,6 +52,7 @@
                                 th:text="${categoryType}">
                         </option>
                     </select>
+                    <p class="alert-warning" th:if="${#fields.hasErrors('incomeCategory')}" th:errors="*{incomeCategory}"></p>
                 </div>
 
                 <button type="submit" class="save-btn">
