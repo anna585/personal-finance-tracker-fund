@@ -97,6 +97,12 @@ public class UserService {
 
     public void deleteUser(UUID id) {
 
+        User user = userRepository.findUserById(id);
+
+        if(user.getUserRole().equals(UserRole.ADMIN)){
+            throw new RuntimeException("ADMIN users cannot be deleted.");
+        }
+
          userRepository.deleteById(id);
     }
 
