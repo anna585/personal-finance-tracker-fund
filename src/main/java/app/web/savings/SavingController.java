@@ -126,7 +126,14 @@ public class SavingController {
     @PostMapping("/{id}/edit")
     public ModelAndView editSavingGoals(
             @PathVariable UUID id,
-            @ModelAttribute EditSavingRequest editSavingRequest){
+            @Valid @ModelAttribute EditSavingRequest editSavingRequest,
+            BindingResult bindingResult){
+
+        if(bindingResult.hasErrors()){
+            return new ModelAndView("edit-savings")
+                   .addObject("editSavingRequest", editSavingRequest)
+                    .addObject("goalId", id);
+        }
 
         savingService.updateSavingGoals(id, editSavingRequest);
 
