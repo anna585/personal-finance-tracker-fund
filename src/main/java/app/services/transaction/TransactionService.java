@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -48,11 +49,11 @@ public class TransactionService {
 
         Budget budget = budgetRepository.findByUserAndMonthAndYear(user, now.getMonth(), now.getYear())
                 .orElseThrow(() ->
-                        new RuntimeException("Budget is empty. Please create new budget."));
+                        new RuntimeException("No budget found. Please create a budget first."));
 
 
         if(budget.getMonthlyLimit().compareTo(transactionRequest.getAmount()) < 0 && transactionRequest.getType().equals(TransactionType.EXPENSE)){
-            throw new RuntimeException("Transaction is not successful. Please check your budget!");
+            throw new RuntimeException("The monthly budget is not sufficient to create this transaction.");
         }
 
         Transaction transaction = Transaction.builder()
@@ -69,11 +70,18 @@ public class TransactionService {
     }
 
     public UserDto createExpenseTransaction(UUID id, ExpenseTransactionRequest expenseTransactionRequest) {
-
+        LocalDateTime now = LocalDateTime.now();
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("User not found!"));
 
+        Budget budget = budgetRepository.findByUserAndMonthAndYear(user, now.getMonth(), now.getYear())
+                .orElseThrow(() ->
+                        new RuntimeException("No budget found. Please create a budget first."));
+
+        if(budget.getMonthlyLimit().compareTo(expenseTransactionRequest.getExpenseAmount()) < 0){
+            throw new RuntimeException("The monthly budget is not sufficient to create this transaction.");
+        }
 
         Transaction transaction = Transaction.builder()
                 .user(user)
@@ -140,5 +148,10 @@ public class TransactionService {
     public long getCountOfTransaction() {
 
         return transactionRepository.count();
+    }
+
+    public List<Transaction> getAllTransactionsByUser(UUID id) {
+
+        return transactionRepository.findAllByUserIdOrderByDateDesc(id);
     }
 }
