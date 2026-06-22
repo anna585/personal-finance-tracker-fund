@@ -4,6 +4,7 @@ import app.model.dto.user.UserDto;
 import app.model.dto.user.UserLoginRequest;
 import app.model.dto.user.UserRegisterRequest;
 import app.model.entities.user.User;
+import app.model.entities.user.UserRole;
 import app.services.budget.BudgetService;
 import app.services.saving.SavingService;
 import app.services.transaction.TransactionService;
@@ -161,7 +162,16 @@ public class UserController {
             return new ModelAndView("redirect:/admin/users");
         }
 
-        userService.deleteUser(id);
-        return new ModelAndView("redirect:/admin/users");
+        try {
+            userService.deleteUser(id);
+            return new ModelAndView("redirect:/admin/users");
+
+        } catch (RuntimeException e) {
+
+            return new ModelAndView("users")
+                    .addObject("error", e.getMessage());
+        }
+
+
     }
 }
