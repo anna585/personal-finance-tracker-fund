@@ -68,7 +68,7 @@ public class TransactionController {
         if(bindingResult.hasErrors()){
 
             return populateTransaction(new ModelAndView("add-transaction"),
-                    TransactionRequest.builder().build(),
+                   transactionRequest,
                     user);
         }
 

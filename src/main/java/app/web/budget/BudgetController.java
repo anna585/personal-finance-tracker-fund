@@ -85,7 +85,7 @@ public class BudgetController {
         }
 
         budgetService.updateMonthlyBudget(user,monthlyBudgetRequest);
-        return new ModelAndView("redirect:/budget");
+        return new ModelAndView("redirect:/budget?success");
     }
 
 }
