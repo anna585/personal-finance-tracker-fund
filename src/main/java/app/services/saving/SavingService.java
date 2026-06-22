@@ -67,7 +67,7 @@ public class SavingService {
 
         Budget budget = budgetRepository.findByUserAndMonthAndYear(user, now.getMonth(), now.getYear())
                 .orElseThrow(() ->
-                        new RuntimeException("Budget is empty. Please create new budget."));
+                        new RuntimeException("No budget found. Please create a budget first."));
 
         BigDecimal spent = transactionService.getTotalSpentByUser(userId);
         BigDecimal remaining =budget.getMonthlyLimit().subtract(spent);
@@ -76,9 +76,9 @@ public class SavingService {
         BigDecimal currentAmountAndAutoSave = savingRequest.getCurrentAmount().add(autoSave);
 
         if(remaining.compareTo(autoSave) < 0){
-            throw new IllegalArgumentException("Monthly budget is not enough to create your saving goal!");
+            throw new IllegalArgumentException("The monthly budget is not sufficient to create this savings goal.");
         } else if (remaining.compareTo(currentAmountAndAutoSave) < 0) {
-            throw new IllegalArgumentException("The amount entered is not available in the monthly budget.");
+            throw new IllegalArgumentException("The entered amount exceeds the remaining monthly budget.");
         }
 
         Transaction transaction = Transaction.builder()
