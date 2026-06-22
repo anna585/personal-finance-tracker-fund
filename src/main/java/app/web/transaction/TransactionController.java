@@ -44,9 +44,10 @@ public class TransactionController {
 
         User user = userService.getCurrentUser(httpSession);
 
-        return populateTransaction(new ModelAndView("transactions"),
-                TransactionRequest.builder().build(),
-                user);
+        return new ModelAndView("transactions")
+                .addObject("user", user)
+                .addObject("transactions",
+                        transactionService.getAllTransactionsByUser(user.getId()));
     }
 
     @GetMapping("/add")
@@ -72,9 +73,20 @@ public class TransactionController {
                     user);
         }
 
-        transactionService.createNewTransaction(user.getId(), transactionRequest);
+        try{
+            transactionService.createNewTransaction(user.getId(), transactionRequest);
+            return new ModelAndView("redirect:/transactions?success");
 
-        return new ModelAndView("redirect:/transactions");
+        }catch (RuntimeException ex){
+
+            return new ModelAndView("transactions")
+                    .addObject("user", user)
+                    .addObject("transactions",
+                    transactionService.getAllTransactionsByUser(user.getId()))
+                    .addObject("transactionRequest", transactionRequest)
+                    .addObject("error", ex.getMessage());
+        }
+
     }
 
     @GetMapping("add/income")
@@ -103,7 +115,7 @@ public class TransactionController {
         }
 
         transactionService.createIncomeTransaction(user.getId(), incomeTransactionRequest);
-        return new ModelAndView("redirect:/transactions");
+        return new ModelAndView("redirect:/transactions?success");
     }
 
     @GetMapping("add/expense")
@@ -132,9 +144,20 @@ public class TransactionController {
                     .addObject("expenseTransactionRequest", expenseTransactionRequest);
         }
 
-        transactionService.createExpenseTransaction(user.getId(), expenseTransactionRequest);
+        try{
+            transactionService.createExpenseTransaction(user.getId(), expenseTransactionRequest);
+            return new ModelAndView("redirect:/transactions?success");
 
-        return new ModelAndView("redirect:/transactions");
+        }catch (RuntimeException ex){
+
+            return new ModelAndView("transactions")
+                    .addObject("user", user)
+                    .addObject("transactions",
+                            transactionService.getAllTransactionsByUser(user.getId()))
+                    .addObject("expenseTransactionRequest", expenseTransactionRequest)
+                    .addObject("error", ex.getMessage());
+        }
+
     }
 
     @PostMapping("/{id}/delete")
