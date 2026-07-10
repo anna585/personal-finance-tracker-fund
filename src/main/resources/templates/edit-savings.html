@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Edit Saving Goal | FinanceTracker</title>
@@ -16,8 +16,11 @@
             <a href="/budget">Budget</a>
             <a href="/savings">Savings</a>
             <a href="/transactions">Transactions</a>
-            <a href="/admin/users">Users</a>
-            <a href="/admin/reports">Reports</a>
+            <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <a href="/admin/users">Users</a>
+                <span> | </span>
+                <a href="/admin/reports">Reports</a>
+            </div>
             <a href="/logout" class="logout-btn">Logout</a>
         </div>
     </nav>
