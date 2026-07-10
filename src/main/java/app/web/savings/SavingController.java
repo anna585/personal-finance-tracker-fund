@@ -3,11 +3,12 @@ package app.web.savings;
 import app.model.dto.saving.EditSavingRequest;
 import app.model.dto.saving.SavingGoalsDto;
 import app.model.dto.saving.SavingRequest;
-import app.model.entities.user.User;
+import app.model.dto.user.AuthenticationUserDetails;
+import app.model.dto.user.UserDto;
 import app.services.saving.SavingService;
 import app.services.user.UserService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class SavingController {
 
     public ModelAndView populateSavingGoals(ModelAndView modelAndView,
                                             SavingRequest savingRequest,
-                                            User user){
+                                            UserDto user){
 
         return modelAndView
                 .addObject("user", user)
@@ -40,9 +41,9 @@ public class SavingController {
     }
 
     @GetMapping
-    public ModelAndView savingsGoals(HttpSession httpSession) {
+    public ModelAndView savingsGoals(@AuthenticationPrincipal AuthenticationUserDetails principal) {
 
-        User user = userService.getCurrentUser(httpSession);
+        UserDto user = userService.getById(principal.getId());
 
         return new ModelAndView("savings")
                 .addObject("user", user)
@@ -54,9 +55,9 @@ public class SavingController {
     }
 
     @GetMapping("/add")
-    public ModelAndView getAddingGoals(HttpSession httpSession){
+    public ModelAndView getAddingGoals(@AuthenticationPrincipal AuthenticationUserDetails principal){
 
-        User user = userService.getCurrentUser(httpSession);
+        UserDto user = userService.getById(principal.getId());
 
         return populateSavingGoals(new ModelAndView("add-savings"),
                 SavingRequest.builder().build(),
@@ -66,9 +67,9 @@ public class SavingController {
     @PostMapping("/add")
     public ModelAndView postAddingGoals(@Valid @ModelAttribute SavingRequest savingRequest,
                                         BindingResult bindingResult,
-                                        HttpSession httpSession){
+                                        @AuthenticationPrincipal AuthenticationUserDetails principal){
 
-        User user = userService.getCurrentUser(httpSession);
+        UserDto user = userService.getById(principal.getId());
 
         if(bindingResult.hasErrors()){
             return populateSavingGoals(new ModelAndView("add-savings"),
@@ -93,7 +94,7 @@ public class SavingController {
     }
 
     @PostMapping("/{id}/delete")
-    public ModelAndView deleteSavingGoal(@PathVariable UUID id, HttpSession httpSession){
+    public ModelAndView deleteSavingGoal(@PathVariable UUID id){
 
         SavingGoalsDto savingGoal = savingService.getSavingGoalById(id);
 

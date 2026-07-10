@@ -2,12 +2,13 @@ package app.web.budget;
 
 import app.model.dto.budget.BudgetDto;
 import app.model.dto.budget.MonthlyBudgetRequest;
+import app.model.dto.user.AuthenticationUserDetails;
 import app.model.entities.user.User;
 import app.services.budget.BudgetService;
 import app.services.transaction.TransactionService;
 import app.services.user.UserService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,9 +60,9 @@ public class BudgetController {
     }
 
     @GetMapping
-    public ModelAndView getMonthlyBudgetRequest(HttpSession httpSession){
+    public ModelAndView getMonthlyBudgetRequest(@AuthenticationPrincipal AuthenticationUserDetails principal){
 
-        User user = userService.getCurrentUser(httpSession);
+        User user = userService.getEntityById(principal.getId());
 
        return populateBudgetPage(new ModelAndView("budget"),
                MonthlyBudgetRequest.builder().build(),
@@ -72,8 +73,8 @@ public class BudgetController {
     @PostMapping
     public ModelAndView postMonthlyBudgetRequest(@Valid @ModelAttribute MonthlyBudgetRequest monthlyBudgetRequest,
                                                  BindingResult bindingResult,
-                                                 HttpSession httpSession){
-    User user = userService.getCurrentUser(httpSession);
+                                                 @AuthenticationPrincipal AuthenticationUserDetails principal){
+        User user = userService.getEntityById(principal.getId());
 
 
         if(bindingResult.hasErrors()){

@@ -1,16 +1,15 @@
 package app.web.user;
 
+import app.model.dto.user.AuthenticationUserDetails;
 import app.model.dto.user.UserDto;
 import app.model.dto.user.UserLoginRequest;
 import app.model.dto.user.UserRegisterRequest;
-import app.model.entities.user.User;
-import app.model.entities.user.UserRole;
 import app.services.budget.BudgetService;
 import app.services.saving.SavingService;
 import app.services.transaction.TransactionService;
 import app.services.user.UserService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,9 +40,9 @@ public class UserController {
     }
 
     @GetMapping("/dashboard")
-    public ModelAndView dashboard(HttpSession httpSession) {
+    public ModelAndView dashboard(@AuthenticationPrincipal AuthenticationUserDetails principal) {
 
-        User user = userService.getCurrentUser(httpSession);
+        UserDto user = userService.getById(principal.getId());
 
         if (user == null) {
             return new ModelAndView("redirect:/login");
@@ -69,30 +68,6 @@ public class UserController {
 
         return new ModelAndView("login")
                 .addObject("userLoginRequest", userLoginRequest);
-    }
-
-    @PostMapping("/login")
-    public ModelAndView postLogin(@Valid @ModelAttribute UserLoginRequest userLoginRequest,
-                                  BindingResult bindingResult,
-                                  HttpSession httpSession){
-
-        if(bindingResult.hasErrors()){
-            return new ModelAndView("login");
-        }
-
-        try {
-            UserDto user = userService.login(userLoginRequest);
-            httpSession.setAttribute("user_id", user.getId());
-
-            return new ModelAndView("redirect:/dashboard");
-
-        } catch (RuntimeException e) {
-
-            return new ModelAndView("login")
-                    .addObject("userLoginRequest", userLoginRequest)
-                    .addObject("error", e.getMessage());
-        }
-
     }
 
     @GetMapping("/register")
@@ -121,13 +96,6 @@ public class UserController {
                     .addObject("userRegisterRequest", userRegisterRequest)
                     .addObject("error", e.getMessage());
         }
-    }
-
-    @GetMapping("/logout")
-    public ModelAndView getLogoutPage(HttpSession httpSession){
-
-        httpSession.invalidate();
-        return new ModelAndView("redirect:/");
     }
 
     @GetMapping("/admin/users")

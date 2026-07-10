@@ -3,11 +3,12 @@ package app.web.transaction;
 import app.model.dto.transaction.ExpenseTransactionRequest;
 import app.model.dto.transaction.IncomeTransactionRequest;
 import app.model.dto.transaction.TransactionRequest;
-import app.model.entities.user.User;
+import app.model.dto.user.AuthenticationUserDetails;
+import app.model.dto.user.UserDto;
 import app.services.transaction.TransactionService;
 import app.services.user.UserService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class TransactionController {
 
     public ModelAndView populateTransaction(ModelAndView modelAndView,
                                             TransactionRequest transactionRequest,
-                                            User user){
+                                            UserDto user){
 
         return modelAndView
                 .addObject("user", user)
@@ -40,9 +41,9 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ModelAndView getTransactions(HttpSession httpSession){
+    public ModelAndView getTransactions(@AuthenticationPrincipal AuthenticationUserDetails principal){
 
-        User user = userService.getCurrentUser(httpSession);
+        UserDto user = userService.getById(principal.getId());
 
         return new ModelAndView("transactions")
                 .addObject("user", user)
@@ -51,9 +52,9 @@ public class TransactionController {
     }
 
     @GetMapping("/add")
-    public ModelAndView addTransaction(HttpSession httpSession){
+    public ModelAndView addTransaction(@AuthenticationPrincipal AuthenticationUserDetails principal){
 
-        User user = userService.getCurrentUser(httpSession);
+        UserDto user = userService.getById(principal.getId());
 
         return populateTransaction(new ModelAndView("add-transaction"),
                 TransactionRequest.builder().build(),
@@ -63,8 +64,8 @@ public class TransactionController {
     @PostMapping("/add")
     public ModelAndView postTransaction(@Valid @ModelAttribute TransactionRequest transactionRequest,
                                         BindingResult bindingResult,
-                                        HttpSession httpSession){
-        User user = userService.getCurrentUser(httpSession);
+                                        @AuthenticationPrincipal AuthenticationUserDetails principal){
+        UserDto user = userService.getById(principal.getId());
 
         if(bindingResult.hasErrors()){
 
@@ -90,9 +91,9 @@ public class TransactionController {
     }
 
     @GetMapping("add/income")
-    public ModelAndView getIncomeTransaction(HttpSession httpSession){
+    public ModelAndView getIncomeTransaction(@AuthenticationPrincipal AuthenticationUserDetails principal){
 
-        User user = userService.getCurrentUser(httpSession);
+        UserDto user = userService.getById(principal.getId());
 
         IncomeTransactionRequest incomeTransactionRequest = IncomeTransactionRequest.builder().build();
 
@@ -104,8 +105,8 @@ public class TransactionController {
     @PostMapping("/add/income")
     public ModelAndView postIncomeTransaction(@Valid @ModelAttribute IncomeTransactionRequest incomeTransactionRequest,
                                         BindingResult bindingResult,
-                                        HttpSession httpSession){
-        User user = userService.getCurrentUser(httpSession);
+                                              @AuthenticationPrincipal AuthenticationUserDetails principal){
+        UserDto user = userService.getById(principal.getId());
 
         if(bindingResult.hasErrors()){
 
@@ -119,9 +120,9 @@ public class TransactionController {
     }
 
     @GetMapping("add/expense")
-    public ModelAndView getExpenseTransaction(HttpSession httpSession){
+    public ModelAndView getExpenseTransaction(@AuthenticationPrincipal AuthenticationUserDetails principal){
 
-        User user = userService.getCurrentUser(httpSession);
+        UserDto user = userService.getById(principal.getId());
 
         ExpenseTransactionRequest expenseTransactionRequest = ExpenseTransactionRequest.builder().build();
 
@@ -132,10 +133,10 @@ public class TransactionController {
 
     @PostMapping("/add/expense")
     public ModelAndView postExpenseTransaction(@Valid @ModelAttribute ExpenseTransactionRequest expenseTransactionRequest,
-                                              BindingResult bindingResult,
-                                              HttpSession httpSession){
+                                               BindingResult bindingResult,
+                                               @AuthenticationPrincipal AuthenticationUserDetails principal){
 
-        User user = userService.getCurrentUser(httpSession);
+        UserDto user = userService.getById(principal.getId());
 
         if(bindingResult.hasErrors()){
 
