@@ -1,8 +1,8 @@
 package app.services.user;
 
 import app.mapper.user.UserMapper;
+import app.model.dto.user.AuthenticationUserDetails;
 import app.model.dto.user.UserDto;
-import app.model.dto.user.UserLoginRequest;
 import app.model.dto.user.UserRegisterRequest;
 import app.model.entities.budget.Budget;
 import app.model.entities.user.User;
@@ -11,17 +11,20 @@ import app.repositories.user.UserRepository;
 import app.services.budget.BudgetService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @Transactional
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -66,15 +69,15 @@ public class UserService {
         return UserMapper.toUserDto(userEntity);
     }
 
-    public UserDto login(UserLoginRequest userLoginRequest){
-       Optional<User> userLog = userRepository.findByUsername(userLoginRequest.getUsername());
-
-       if(userLog.isEmpty() || !passwordEncoder.matches(userLoginRequest.getPassword(), userLog.get().getPassword())){
-           throw new RuntimeException("Username or password mismatch!");
-       }
-
-       return UserMapper.toUserDto(userLog.get());
-    }
+//    public UserDto login(UserLoginRequest userLoginRequest){
+//       Optional<User> userLog = userRepository.findByUsername(userLoginRequest.getUsername());
+//
+//       if(userLog.isEmpty() || !passwordEncoder.matches(userLoginRequest.getPassword(), userLog.get().getPassword())){
+//           throw new RuntimeException("Username or password mismatch!");
+//       }
+//
+//       return UserMapper.toUserDto(userLog.get());
+//    }
 
     public UserDto getById(UUID id) {
 
@@ -95,6 +98,7 @@ public class UserService {
         return userRepository.findAll().stream().map(UserMapper::toUserDto).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(UUID id) {
 
         User user = userRepository.findUserById(id);
@@ -117,8 +121,22 @@ public class UserService {
         return getEntityById(userId);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public Long getCountOfUsers() {
 
         return userRepository.count();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+        return AuthenticationUserDetails.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .role(user.getUserRole())
+                .build();
     }
 }
