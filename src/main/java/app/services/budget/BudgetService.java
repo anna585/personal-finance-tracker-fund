@@ -1,8 +1,8 @@
 package app.services.budget;
 
 import app.mapper.budget.BudgetMapper;
-import app.model.dto.budget.BudgetDto;
-import app.model.dto.budget.MonthlyBudgetRequest;
+import app.web.dto.budget.BudgetDto;
+import app.web.dto.budget.MonthlyBudgetRequest;
 import app.model.entities.budget.Budget;
 import app.model.entities.user.User;
 import app.repositories.budget.BudgetRepository;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -80,10 +81,30 @@ public class BudgetService {
                         user,
                         now.getMonth(),
                         now.getYear())
-                .orElseThrow(() ->
-                        new RuntimeException("No budget for current month"));
+                .orElseGet(() ->
+                        createBudgetForCurrentMonth(user, now));
 
         return BudgetMapper.toDto(budget);
+    }
+
+    private Budget createBudgetForCurrentMonth(User user, LocalDateTime now) {
+
+        Budget budget = new Budget();
+        budget.setUser(user);
+        budget.setMonth(now.getMonth());
+        budget.setYear(now.getYear());
+
+
+        List<Budget> budgets = budgetRepository.findLatestBudget(user);
+
+        if (!budgets.isEmpty()) {
+            budget.setMonthlyLimit(budgets.get(0).getMonthlyLimit());
+        }
+
+        if (budget.getMonthlyLimit() == null){
+            budget.setMonthlyLimit(BigDecimal.ZERO);
+        }
+       return budgetRepository.save(budget);
     }
 
     public Long getCountOfBudgets() {
