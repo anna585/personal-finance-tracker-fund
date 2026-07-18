@@ -1,10 +1,10 @@
 package app.services.transaction;
 
+import app.mapper.transaction.TransactionMapper;
 import app.mapper.user.UserMapper;
-import app.model.dto.transaction.ExpenseTransactionRequest;
-import app.model.dto.transaction.IncomeTransactionRequest;
-import app.model.dto.transaction.TransactionRequest;
-import app.model.dto.user.UserDto;
+import app.web.dto.transaction.TransactionDto;
+import app.web.dto.transaction.TransactionRequest;
+import app.web.dto.user.UserDto;
 import app.model.entities.budget.Budget;
 import app.model.entities.transaction.Transaction;
 import app.model.entities.transaction.TransactionType;
@@ -15,15 +15,19 @@ import app.repositories.transaction.TransactionRepository;
 
 import app.repositories.user.UserRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
@@ -31,14 +35,6 @@ public class TransactionService {
     private final UserRepository userRepository;
     private final SavingRepository savingRepository;
 
-    public TransactionService(TransactionRepository transactionRepository,
-                              BudgetRepository budgetRepository,
-                              UserRepository userRepository, SavingRepository savingRepository) {
-        this.transactionRepository = transactionRepository;
-        this.budgetRepository = budgetRepository;
-        this.userRepository = userRepository;
-        this.savingRepository = savingRepository;
-    }
 
     public UserDto createNewTransaction(UUID id, TransactionRequest transactionRequest) {
         LocalDateTime now = LocalDateTime.now();
@@ -61,7 +57,7 @@ public class TransactionService {
                 .amount(transactionRequest.getAmount())
                 .type(transactionRequest.getType())
                 .categoryType(transactionRequest.getCategory())
-                .date(LocalDateTime.now())
+                .date(LocalDate.now())
                 .build();
 
         transactionRepository.save(transaction);
@@ -69,52 +65,6 @@ public class TransactionService {
         return UserMapper.toUserDto(user);
     }
 
-    public UserDto createExpenseTransaction(UUID id, ExpenseTransactionRequest expenseTransactionRequest) {
-        LocalDateTime now = LocalDateTime.now();
-        User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found!"));
-
-        Budget budget = budgetRepository.findByUserAndMonthAndYear(user, now.getMonth(), now.getYear())
-                .orElseThrow(() ->
-                        new RuntimeException("No budget found. Please create a budget first."));
-
-        if(budget.getMonthlyLimit().compareTo(expenseTransactionRequest.getExpenseAmount()) < 0){
-            throw new RuntimeException("The monthly budget is not sufficient to create this transaction.");
-        }
-
-        Transaction transaction = Transaction.builder()
-                .user(user)
-                .amount(expenseTransactionRequest.getExpenseAmount())
-                .categoryType(expenseTransactionRequest.getExpenseCategory())
-                .type(TransactionType.EXPENSE)
-                .date(LocalDateTime.now())
-                .build();
-
-        transactionRepository.save(transaction);
-
-        return UserMapper.toUserDto(user);
-    }
-
-    public UserDto createIncomeTransaction(UUID id, IncomeTransactionRequest incomeTransactionRequest) {
-
-        User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found!"));
-
-
-        Transaction transaction = Transaction.builder()
-                .user(user)
-                .amount(incomeTransactionRequest.getIncomeAmount())
-                .categoryType(incomeTransactionRequest.getIncomeCategory())
-                .type(TransactionType.INCOME)
-                .date(LocalDateTime.now())
-                .build();
-
-        transactionRepository.save(transaction);
-
-        return UserMapper.toUserDto(user);
-    }
     public BigDecimal getTotalSpentByUser(UUID userId) {
 
        return transactionRepository.getTotalSpentByUser(userId) != null
@@ -137,21 +87,36 @@ public class TransactionService {
         transactionRepository.deleteById(id);
     }
 
-    public BigDecimal calculateCurrentBalance(UUID userId) {
-
-        BigDecimal income = getTotalIncomeByUser(userId);
-        BigDecimal expenses = getTotalSpentByUser(userId);
-
-        return income.subtract(expenses);
-    }
-
-    public long getCountOfTransaction() {
-
-        return transactionRepository.count();
-    }
-
     public List<Transaction> getAllTransactionsByUser(UUID id) {
 
         return transactionRepository.findAllByUserIdOrderByDateDesc(id);
+    }
+
+    public List<Transaction> getTransactionForReport(UUID userId, LocalDate start, LocalDate end ) {
+        return transactionRepository
+                .findByUserIdAndDateBetween(userId, start, end);
+    }
+
+    public TransactionDto getTransactionById(UUID id) {
+
+        Transaction transaction = transactionRepository.findTransactionById(id);
+
+        return TransactionMapper.toDto(transaction);
+    }
+
+    public TransactionDto updateTransaction(UUID id, TransactionRequest transactionRequest) {
+
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction with id [%s] does not exist".formatted(id)));
+
+        transaction.setAmount(transactionRequest.getAmount());
+        transaction.setType(transactionRequest.getType());
+        transaction.setCategoryType(transaction.getCategoryType());
+        transaction.setDate(transaction.getDate());
+
+
+        transactionRepository.save(transaction);
+
+        return TransactionMapper.toDto(transaction);
     }
 }
