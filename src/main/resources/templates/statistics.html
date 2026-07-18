@@ -30,22 +30,22 @@
 
         <div class="card">
             <h3>Total Users</h3>
-            <span th:text="${countOfUsers}"></span>
+            <span th:text="${statisticResponse.getTotalUsers()}"></span>
         </div>
 
         <div class="card">
             <h3>Total Transactions</h3>
-            <span th:text="${countOfTransactions}"></span>
+            <span th:text="${statisticResponse.getTotalTransactions()}"></span>
         </div>
 
         <div class="card">
             <h3>Total Budgets</h3>
-            <span th:text="${countOfBudgets}"></span>
+            <span th:text="${statisticResponse.getTotalBudget()}"></span>
         </div>
 
         <div class="card">
             <h3>Saving Goals</h3>
-            <span th:text="${countOfSavingGoals}"></span>
+            <span th:text="${statisticResponse.getTotalSavings()}"></span>
         </div>
 
     </section>
@@ -67,7 +67,7 @@
             <tbody>
 
             <tr th:each="user : ${users}">
-                <td th:text="${user.username}"></td>
+                <td th:text="${user.getUsername()}"></td>
                 <td th:text="${user.email}"></td>
                 <td th:text="${#temporals.format(user.createdOn, 'yyyy-MM-dd')}"></td>
             </tr>
