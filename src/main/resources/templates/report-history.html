@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Report History</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/budget-reports.css">
+</head>
+
+<body class="bg-light">
+
+<header>
+    <nav class="navbar">
+        <h2 class="logo">FinanceTracker</h2>
+
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/transactions">Transactions</a>
+            <a href="/budget">Budget</a>
+            <a href="/savings">Savings</a>
+            <a href="/report-history">Report History</a>
+            <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <a href="/admin/users">Users</a>
+                <span> | </span>
+                <a href="/admin/statistics">Statistics</a>
+            </div>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+</header>
+
+<div class="container py-5">
+
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Report History</h2>
+        <p class="text-muted">Previously generated monthly reports</p>
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-primary">
+                <tr>
+                    <th>Generated</th>
+                    <th>Income</th>
+                    <th>Expenses</th>
+                    <th>Balance</th>
+                    <th>Saving Rate</th>
+                    <th>Largest Expense</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="report : ${responseList}">
+
+                    <td th:text="${#temporals.format(report.generatedAt,'dd/MM/yyyy')}"></td>
+                    <td class="text-success fw-bold" th:text="'€ ' + ${report.income}"></td>
+                    <td class="text-danger fw-bold" th:text="'€ ' + ${report.expenses}"></td>
+                    <td th:text="'€ ' + ${report.balance}"></td>
+                    <td th:text="${report.savingRate + ' %'}"></td>
+                    <td th:text="${report.largestExpense}"></td>
+
+                    <td class="text-center">
+
+                        <form th:action="@{/report-history/{reportId}(reportId=${report.id})}"
+                              method="post"
+                              onsubmit="return confirm('Delete this report?');">
+
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Delete
+                            </button>
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
