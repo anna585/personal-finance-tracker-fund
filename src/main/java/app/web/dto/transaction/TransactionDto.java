@@ -1,6 +1,5 @@
-package app.model.dto.transaction;
+package app.web.dto.transaction;
 
-import app.model.dto.user.UserDto;
 import app.model.entities.transaction.CategoryType;
 import app.model.entities.transaction.TransactionType;
 import jakarta.validation.constraints.NotBlank;
@@ -10,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Builder
@@ -24,7 +23,7 @@ public class TransactionDto {
     @NotBlank(message = "Please enter type of the transaction.")
     private TransactionType type;
     @NotNull(message = "Target date is required")
-    private LocalDateTime date;
+    private LocalDate date;
     @NotBlank(message = "Please enter category of the transaction.")
     private CategoryType category;
 }
