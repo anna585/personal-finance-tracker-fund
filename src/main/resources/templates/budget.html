@@ -9,17 +9,18 @@
 
 <header>
     <nav class="navbar">
-        <h2>FinanceTracker</h2>
+        <h2 class="logo">FinanceTracker</h2>
 
         <div class="nav-links">
             <a href="/dashboard">Dashboard</a>
+            <a href="/transactions">Transactions</a>
             <a href="/budget">Budget</a>
             <a href="/savings">Savings</a>
-            <a href="/transactions">Transactions</a>
+            <a href="/report-history">Report History</a>
             <div sec:authorize="hasRole('ROLE_ADMIN')">
                 <a href="/admin/users">Users</a>
                 <span> | </span>
-                <a href="/admin/reports">Reports</a>
+                <a href="/admin/statistics">Statistics</a>
             </div>
             <a href="/logout" class="logout-btn">Logout</a>
         </div>
