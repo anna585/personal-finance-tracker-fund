@@ -103,11 +103,6 @@ public class SavingService {
 
     }
 
-    public Long getCountOfSavingGoals() {
-
-        return savingRepository.count();
-    }
-
     public List<SavingGoal> getAllSavingGoalsByUser(UUID userId) {
 
         return savingRepository.findAllByUserId(userId);
@@ -127,9 +122,8 @@ public class SavingService {
         savingEntity.setTargetAmount(editSavingRequest.getTargetAmount());
         savingEntity.setCurrentAmount(editSavingRequest.getCurrentAmount());
         savingEntity.setTargetDate(editSavingRequest.getTargetDate());
+        savingRepository.save(savingEntity);
 
-        SavingGoal updateSavingGoal = savingRepository.save(savingEntity);
-
-        return SavingGoalsMapper.toDto(updateSavingGoal);
+        return SavingGoalsMapper.toDto(savingEntity);
     }
 }

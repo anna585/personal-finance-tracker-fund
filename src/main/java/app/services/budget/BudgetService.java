@@ -104,10 +104,6 @@ public class BudgetService {
        return budgetRepository.save(budget);
     }
 
-    public Long getCountOfBudgets() {
-
-        return budgetRepository.count();
-    }
 
     public BigDecimal calculateRemainingBudget(User user) {
 

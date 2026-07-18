@@ -1,15 +1,14 @@
-package app.web.user;
+package app.web.controllers.user;
 
-import app.model.dto.user.AuthenticationUserDetails;
-import app.model.dto.user.UserDto;
-import app.model.dto.user.UserLoginRequest;
-import app.model.dto.user.UserRegisterRequest;
+import app.web.dto.user.UserDto;
+import app.web.dto.user.UserLoginRequest;
+import app.web.dto.user.UserRegisterRequest;
 import app.services.budget.BudgetService;
 import app.services.saving.SavingService;
 import app.services.transaction.TransactionService;
 import app.services.user.UserService;
 import jakarta.validation.Valid;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +17,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.math.BigDecimal;
+
 import java.util.UUID;
 
 @Controller
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
@@ -29,37 +29,6 @@ public class UserController {
     private final BudgetService budgetService;
     private final SavingService savingService;
 
-    public UserController(UserService userService,
-                          TransactionService transactionService,
-                          BudgetService budgetService,
-                          SavingService savingService) {
-        this.userService = userService;
-        this.transactionService = transactionService;
-        this.budgetService = budgetService;
-        this.savingService = savingService;
-    }
-
-    @GetMapping("/dashboard")
-    public ModelAndView dashboard(@AuthenticationPrincipal AuthenticationUserDetails principal) {
-
-        UserDto user = userService.getById(principal.getId());
-
-        if (user == null) {
-            return new ModelAndView("redirect:/login");
-        }
-
-        BigDecimal income = transactionService.getTotalIncomeByUser(user.getId());
-        BigDecimal expenses = transactionService.getTotalSpentByUser(user.getId());
-
-        BigDecimal currentBalance =
-                transactionService.calculateCurrentBalance(user.getId());
-
-        return new ModelAndView("dashboard")
-                .addObject("user", user)
-                .addObject("income", income)
-                .addObject("expenses", expenses)
-                .addObject("currentBalance", currentBalance);
-    }
 
     @GetMapping("/login")
     public ModelAndView getLogin() {
@@ -86,16 +55,8 @@ public class UserController {
             return new ModelAndView("register");
         }
 
-        try {
             userService.register(userRegisterRequest);
             return new ModelAndView("redirect:/login");
-
-        } catch (RuntimeException e) {
-
-            return new ModelAndView("register")
-                    .addObject("userRegisterRequest", userRegisterRequest)
-                    .addObject("error", e.getMessage());
-        }
     }
 
     @GetMapping("/admin/users")
@@ -105,21 +66,6 @@ public class UserController {
                 .addObject("users", userService.getAllUsers());
     }
 
-    @GetMapping("/admin/reports")
-    public ModelAndView getReports(){
-
-        Long countOfUsers = userService.getCountOfUsers();
-        Long countOfTransactions = transactionService.getCountOfTransaction();
-        Long countOfBudgets = budgetService.getCountOfBudgets();
-        Long countOfSavingGoals = savingService.getCountOfSavingGoals();
-
-        return new ModelAndView("reports")
-                .addObject("users", userService.getAllUsers())
-                .addObject("countOfUsers", countOfUsers)
-                .addObject("countOfTransactions", countOfTransactions)
-                .addObject("countOfBudgets", countOfBudgets)
-                .addObject("countOfSavingGoals", countOfSavingGoals);
-    }
 
     @PostMapping("/users/{id}/delete")
     public ModelAndView deleteUser(@PathVariable UUID id){
