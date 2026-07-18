@@ -1,7 +1,6 @@
 package app.mapper.transaction;
 
-import app.mapper.user.UserMapper;
-import app.model.dto.transaction.TransactionDto;
+import app.web.dto.transaction.TransactionDto;
 import app.model.entities.transaction.Transaction;
 import lombok.NoArgsConstructor;
 

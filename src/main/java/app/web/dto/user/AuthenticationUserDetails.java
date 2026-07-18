@@ -1,4 +1,4 @@
-package app.model.dto.user;
+package app.web.dto.user;
 
 import app.model.entities.user.UserRole;
 import lombok.AllArgsConstructor;
