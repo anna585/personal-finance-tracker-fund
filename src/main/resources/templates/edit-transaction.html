@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Transaction | FinanceTracker</title>
+    <link rel="stylesheet" href="/css/add-transaction.css">
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <h2 class="logo">FinanceTracker</h2>
+
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/transactions">Transactions</a>
+            <a href="/budget">Budget</a>
+            <a href="/savings">Savings</a>
+            <a href="/report-history">Report History</a>
+            <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <a href="/admin/users">Users</a>
+                <span> | </span>
+                <a href="/admin/statistics">Statistics</a>
+            </div>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+</header>
+
+<main>
+
+    <div class="form-container">
+
+        <div class="form-card">
+
+            <h1>Add Transaction</h1>
+
+            <form th:action="@{/transactions/{id}/edit(id=${transactionId})}" th:object="${transactionRequest}" th:method="post">
+
+                <div class="form-group">
+                    <label>Amount</label>
+                    <input type="number"
+                           name="amount"
+                           placeholder="Enter amount"
+                           th:field="*{amount}">
+                    <p class="alert-warning" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></p>
+                </div>
+
+                <div class="form-group">
+                    <label>Type</label>
+
+                    <select th:field="*{type}">
+                        <option value="">Select type</option>
+                        <option th:each="type : ${T(app.model.entities.transaction.TransactionType).values()}"
+                                th:value="${type}"
+                                th:text="${type}">
+
+                        </option>
+                    </select>
+                    <p class="alert-warning" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></p>
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+
+                    <select th:field="*{category}">
+                        <option value="">Select category</option>
+                        <option th:each="categoryType : ${T(app.model.entities.transaction.CategoryType).values()}"
+                                th:value="${categoryType}"
+                                th:text="${categoryType}">
+                        </option>
+                    </select>
+                    <p class="alert-warning" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></p>
+                </div>
+                <button type="submit" class="save-btn">
+                    Save Transaction
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>
