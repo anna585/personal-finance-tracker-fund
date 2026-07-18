@@ -8,6 +8,7 @@ import app.model.entities.user.User;
 import app.repositories.budget.BudgetRepository;
 import app.services.transaction.TransactionService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,16 +18,12 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class BudgetService {
 
     private final BudgetRepository budgetRepository;
     private final TransactionService transactionService;
 
-
-    public BudgetService(BudgetRepository budgetRepository,TransactionService transactionService) {
-        this.budgetRepository = budgetRepository;
-        this.transactionService = transactionService;
-    }
 
     public Budget createDefaultBudget(User user){
 

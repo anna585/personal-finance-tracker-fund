@@ -2,10 +2,10 @@ package app.services.saving;
 
 import app.mapper.saving.SavingGoalsMapper;
 import app.mapper.user.UserMapper;
-import app.model.dto.saving.EditSavingRequest;
-import app.model.dto.saving.SavingGoalsDto;
-import app.model.dto.saving.SavingRequest;
-import app.model.dto.user.UserDto;
+import app.web.dto.saving.EditSavingRequest;
+import app.web.dto.saving.SavingGoalsDto;
+import app.web.dto.saving.SavingRequest;
+import app.web.dto.user.UserDto;
 import app.model.entities.budget.Budget;
 import app.model.entities.saving.SavingGoal;
 import app.model.entities.transaction.CategoryType;
@@ -19,16 +19,19 @@ import app.repositories.user.UserRepository;
 import app.services.transaction.TransactionService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class SavingService {
 
     private final SavingRepository savingRepository;
@@ -36,15 +39,6 @@ public class SavingService {
     private final UserRepository userRepository;
     private final BudgetRepository budgetRepository;
     private final TransactionService transactionService;
-
-    public SavingService(SavingRepository savingRepository,
-                         TransactionRepository transactionRepository, UserRepository userRepository, BudgetRepository budgetRepository, TransactionService transactionService) {
-        this.savingRepository = savingRepository;
-        this.transactionRepository = transactionRepository;
-        this.userRepository = userRepository;
-        this.budgetRepository = budgetRepository;
-        this.transactionService = transactionService;
-    }
 
     public SavingGoalsDto getSavingGoalById(UUID id) {
 
@@ -86,7 +80,7 @@ public class SavingService {
                 .amount(currentAmountAndAutoSave)
                 .type(TransactionType.EXPENSE)
                 .categoryType(CategoryType.SAVING)
-                .date(LocalDateTime.now())
+                .date(LocalDate.now())
                 .build();
         transactionRepository.save(transaction);
 
