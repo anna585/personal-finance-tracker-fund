@@ -4,6 +4,7 @@ package app.services.user;
 import app.web.dto.user.UserDto;
 import app.web.dto.user.UserRegisterRequest;
 import app.model.entities.user.UserRole;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class UserInit implements CommandLineRunner {
 
 
@@ -21,9 +23,6 @@ public class UserInit implements CommandLineRunner {
 
     private final UserService userService;
 
-    public UserInit(UserService userService) {
-        this.userService = userService;
-    }
 
     @Override
     public void run(String... args) throws Exception {
