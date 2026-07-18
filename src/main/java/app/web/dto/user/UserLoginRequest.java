@@ -1,4 +1,4 @@
-package app.model.dto.user;
+package app.web.dto.user;
 
 import jakarta.validation.constraints.Size;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package app.model.dto.user;
+package app.web.dto.user;
 
 import app.model.entities.user.UserRole;
 import jakarta.persistence.Column;
@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @Builder
 @Data

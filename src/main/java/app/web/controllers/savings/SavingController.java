@@ -1,13 +1,14 @@
-package app.web.savings;
+package app.web.controllers.savings;
 
-import app.model.dto.saving.EditSavingRequest;
-import app.model.dto.saving.SavingGoalsDto;
-import app.model.dto.saving.SavingRequest;
-import app.model.dto.user.AuthenticationUserDetails;
-import app.model.dto.user.UserDto;
+import app.web.dto.saving.EditSavingRequest;
+import app.web.dto.saving.SavingGoalsDto;
+import app.web.dto.saving.SavingRequest;
+import app.web.dto.user.AuthenticationUserDetails;
+import app.web.dto.user.UserDto;
 import app.services.saving.SavingService;
 import app.services.user.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -18,17 +19,11 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/savings")
+@RequiredArgsConstructor
 public class SavingController {
 
     private final UserService userService;
     private final SavingService savingService;
-
-
-    public SavingController(UserService userService,
-                            SavingService savingService) {
-        this.userService = userService;
-        this.savingService = savingService;
-    }
 
     public ModelAndView populateSavingGoals(ModelAndView modelAndView,
                                             SavingRequest savingRequest,

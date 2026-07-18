@@ -3,11 +3,11 @@ package app.mapper.user;
 import app.mapper.budget.BudgetMapper;
 import app.mapper.saving.SavingGoalsMapper;
 import app.mapper.transaction.TransactionMapper;
-import app.model.dto.budget.BudgetDto;
-import app.model.dto.saving.SavingGoalsDto;
-import app.model.dto.transaction.TransactionDto;
-import app.model.dto.user.UserDto;
-import app.model.dto.user.UserRegisterRequest;
+import app.web.dto.budget.BudgetDto;
+import app.web.dto.saving.SavingGoalsDto;
+import app.web.dto.transaction.TransactionDto;
+import app.web.dto.user.UserDto;
+import app.web.dto.user.UserRegisterRequest;
 import app.model.entities.user.User;
 import lombok.NoArgsConstructor;
 

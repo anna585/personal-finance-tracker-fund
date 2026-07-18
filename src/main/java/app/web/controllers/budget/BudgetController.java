@@ -1,13 +1,14 @@
-package app.web.budget;
+package app.web.controllers.budget;
 
-import app.model.dto.budget.BudgetDto;
-import app.model.dto.budget.MonthlyBudgetRequest;
-import app.model.dto.user.AuthenticationUserDetails;
+import app.web.dto.budget.BudgetDto;
+import app.web.dto.budget.MonthlyBudgetRequest;
+import app.web.dto.user.AuthenticationUserDetails;
 import app.model.entities.user.User;
 import app.services.budget.BudgetService;
 import app.services.transaction.TransactionService;
 import app.services.user.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -22,19 +23,12 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping("/budget")
+@RequiredArgsConstructor
 public class BudgetController {
 
     private final UserService userService;
     private final BudgetService budgetService;
     private final TransactionService transactionService;
-
-    public BudgetController(UserService userService,
-                            BudgetService budgetService,
-                            TransactionService transactionService) {
-        this.userService = userService;
-        this.budgetService = budgetService;
-        this.transactionService = transactionService;
-    }
 
     public ModelAndView populateBudgetPage(ModelAndView modelAndView,
                                            MonthlyBudgetRequest monthlyBudgetRequest,

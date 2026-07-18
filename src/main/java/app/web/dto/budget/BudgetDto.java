@@ -1,6 +1,5 @@
-package app.model.dto.budget;
+package app.web.dto.budget;
 
-import app.model.dto.user.UserDto;
 import lombok.Builder;
 import lombok.Data;
 

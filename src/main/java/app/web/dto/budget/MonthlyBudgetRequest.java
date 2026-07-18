@@ -1,4 +1,4 @@
-package app.model.dto.budget;
+package app.web.dto.budget;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

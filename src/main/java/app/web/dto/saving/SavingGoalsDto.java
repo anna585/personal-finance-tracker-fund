@@ -1,4 +1,4 @@
-package app.model.dto.saving;
+package app.web.dto.saving;
 
 import app.model.entities.transaction.CategoryType;
 import lombok.Builder;

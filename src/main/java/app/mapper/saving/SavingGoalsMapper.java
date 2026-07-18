@@ -1,7 +1,6 @@
 package app.mapper.saving;
 
-import app.mapper.user.UserMapper;
-import app.model.dto.saving.SavingGoalsDto;
+import app.web.dto.saving.SavingGoalsDto;
 import app.model.entities.saving.SavingGoal;
 import lombok.NoArgsConstructor;
 

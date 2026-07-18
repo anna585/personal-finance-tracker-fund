@@ -1,7 +1,6 @@
 package app.mapper.budget;
 
-import app.mapper.user.UserMapper;
-import app.model.dto.budget.BudgetDto;
+import app.web.dto.budget.BudgetDto;
 import app.model.entities.budget.Budget;
 import lombok.NoArgsConstructor;
 

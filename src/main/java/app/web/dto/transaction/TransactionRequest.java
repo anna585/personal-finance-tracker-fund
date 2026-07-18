@@ -1,4 +1,4 @@
-package app.model.dto.transaction;
+package app.web.dto.transaction;
 
 import app.model.entities.transaction.CategoryType;
 import app.model.entities.transaction.TransactionType;

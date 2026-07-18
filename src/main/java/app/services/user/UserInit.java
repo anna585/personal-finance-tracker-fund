@@ -1,8 +1,8 @@
 package app.services.user;
 
 
-import app.model.dto.user.UserDto;
-import app.model.dto.user.UserRegisterRequest;
+import app.web.dto.user.UserDto;
+import app.web.dto.user.UserRegisterRequest;
 import app.model.entities.user.UserRole;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
