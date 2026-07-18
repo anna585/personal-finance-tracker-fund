@@ -23,7 +23,6 @@ public class Budget {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal monthlyLimit;
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     private Month month;
     private int year;
     @ManyToOne
