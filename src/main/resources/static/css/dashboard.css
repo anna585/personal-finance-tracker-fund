@@ -1,13 +1,7 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
     font-family: Arial, sans-serif;
     background: #f5f7fb;
-    color: #333;
+    margin:0;
 }
 
 /* Navbar */
@@ -96,6 +90,10 @@ body {
     border-top: 5px solid #e74c3c;
 }
 
+.saving-card {
+    border-top: 5px solid #0323a5;
+}
+
 /* Buttons */
 
 .actions {
@@ -118,12 +116,12 @@ body {
     font-weight: bold;
 }
 
-.income-btn {
-    background: #27ae60;
+.new-report-btn {
+    background: #1ac6ff;
 }
 
-.expense-btn {
-    background: #e74c3c;
+.report-history-btn {
+    background: #063af1;
 }
 
 /* Transactions */
