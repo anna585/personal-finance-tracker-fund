@@ -30,6 +30,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
+                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/dashboard", true)
                         .failureUrl("/login?error")
                         .permitAll()
@@ -42,16 +43,4 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         return http.build();
     }
 
-//    private final SessionInterceptor sessionInterceptor;
-//
-//    public WebMvcConfiguration(SessionInterceptor sessionInterceptor) {
-//        this.sessionInterceptor = sessionInterceptor;
-//    }
-//
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(sessionInterceptor)
-//                .addPathPatterns("/**")
-//                .excludePathPatterns("/css/**", "/images/**");
-//    }
 }
