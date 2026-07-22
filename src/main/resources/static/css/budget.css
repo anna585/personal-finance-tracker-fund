@@ -54,6 +54,10 @@ body{
     font-weight:bold;
 }
 
+.budget{
+    border-top:5px solid #063af1;
+}
+
 .spent{
     border-top:5px solid #e74c3c;
 }

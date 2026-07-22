@@ -135,10 +135,11 @@ body {
 
 .error {
     background-color: #ffe6e6;
-    color: #d32f2f;
-    border: 1px solid #d32f2f;
+    color: #2563EB;
+    border: 1px solid #2563EB;
     padding: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    margin-top: 30px;
     border-radius: 8px;
     text-align: center;
     font-weight: bold;

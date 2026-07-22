@@ -40,7 +40,7 @@ body {
 
 .welcome-section {
     text-align: center;
-    padding: 40px 20px;
+    padding: 20px 20px;
 }
 
 .welcome-section h1 {
@@ -82,6 +82,10 @@ body {
     font-weight: bold;
 }
 
+.current-balance{
+    border-top: 5px solid #ffd700;
+}
+
 .income-card {
     border-top: 5px solid #27ae60;
 }
@@ -91,7 +95,7 @@ body {
 }
 
 .saving-card {
-    border-top: 5px solid #0323a5;
+    border-top: 5px solid #063af1;
 }
 
 /* Buttons */
@@ -126,7 +130,7 @@ body {
 
 /* Transactions */
 
-.transactions {
+.transactions, .alert-warning{
     max-width: 1000px;
 
     margin: auto;
@@ -172,5 +176,14 @@ tr:nth-child(even) {
 
 .expense {
     color: #e74c3c;
+    font-weight: bold;
+}
+
+.alert-warning {
+    color: #2563EB;
+    padding: 12px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    text-align: center;
     font-weight: bold;
 }

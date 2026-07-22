@@ -25,8 +25,8 @@ body {
 }
 
 .error-code {
-    font-size: 7rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 300;
     color: #dc3545;
     margin-bottom: 10px;
 }
@@ -41,7 +41,7 @@ body {
 .error-message {
     font-size: 1.1rem;
     color: #6c757d;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .error-submessage {
