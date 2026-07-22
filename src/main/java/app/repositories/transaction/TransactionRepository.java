@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,9 +30,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
         """)
     BigDecimal getTotalIncomeByUser(UUID userId);
 
-    List<Transaction> findAllByUserIdOrderByDateDesc(UUID id);
+    List<Transaction> findAllByUserIdOrderByCreatedAtDesc(UUID id);
 
-   List<Transaction> findByUserIdAndDateBetween(UUID userId, LocalDate start, LocalDate end);
+   List<Transaction> findByUserIdAndCreatedAtBetween(UUID userId, LocalDateTime start, LocalDateTime end);
 
-    Transaction findTransactionById(UUID id);
+    List<Transaction> findTop5ByUserIdOrderByCreatedAtDesc(UUID id);
 }
