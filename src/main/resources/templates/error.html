@@ -17,7 +17,9 @@
 
 <div class="container text-center mt-5">
 
-    <h1 class="display-1 fw-bold text-danger" th:text="${errorCode}"></h1>
+    <div class="my-4">
+        <span style="font-size: 5rem;">⚠️</span>
+    </div>
 
     <p class="lead text-muted" th:text="${errorTitle}">
         Oops! Something went wrong while processing your request.
@@ -27,15 +29,15 @@
 
     </p>
 
-    <div class="my-4">
-        <span style="font-size: 5rem;">⚠️</span>
-    </div>
-
+    <strong>Error code:
+    <span th:text="${errorCode}"></span>
+    </strong>
     <p class="text-secondary">
         Please try again later. If the problem persists, contact the administrator.
     </p>
     <div class="mt-4">
-        <a th:href="@{/dashboard}" class="btn btn-primary me-2">
+
+        <a href="javascript:history.back()" class="btn btn-primary me-2">
             Go Back
         </a>
 

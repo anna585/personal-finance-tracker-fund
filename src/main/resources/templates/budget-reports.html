@@ -52,7 +52,7 @@
                                 type="date"
                                 class="form-control"
                                 th:field="*{start}">
-                        <p class="alert-warning" th:if="${#fields.hasErrors('start')}" th:errors="${start}">
+                        <p class="alert-warning" th:if="${#fields.hasErrors('start')}" th:errors="*{start}">
                     </div>
 
                     <div class="col-md-5">
@@ -85,7 +85,7 @@
     </div>
 
     <div class="card shadow-lg mt-5 border-0"
-         th:if="${reports != null}">
+         th:if="${report != null}">
 
         <div class="card-header bg-primary text-white">
 
@@ -101,17 +101,17 @@
 
                     <div class="report-item">
                         <span>Total Income</span>
-                        <strong th:text="${reports.income}"></strong>
+                        <strong th:text="${@currencyFormatter.format(report.income)}"></strong>
                     </div>
 
                     <div class="report-item">
                         <span>Total Expenses</span>
-                        <strong th:text="${reports.expenses}"></strong>
+                        <strong th:text="${@currencyFormatter.format(report.expenses)}"></strong>
                     </div>
 
                     <div class="report-item">
                         <span>Current Balance</span>
-                        <strong th:text="${reports.balance}"></strong>
+                        <strong th:text="${@currencyFormatter.format(report.balance)}"></strong>
                     </div>
 
                 </div>
@@ -120,17 +120,17 @@
 
                     <div class="report-item">
                         <span>Largest Expense Category</span>
-                        <strong th:text="${reports.largestExpense}"></strong>
+                        <strong th:text="${report.largestExpense}"></strong>
                     </div>
 
                     <div class="report-item">
                         <span>Saving Rate</span>
-                        <strong th:text="${reports.savingRate + '%'}"></strong>
+                        <strong th:text="${report.savingRate + ' %'}"></strong>
                     </div>
 
                     <div class="report-item">
                         <span>Generated At</span>
-                        <strong th:text="${#temporals.format(reports.generatedAt, 'dd/MM/yyyy')}"></strong>
+                        <strong th:text="${#temporals.format(report.generatedAt, 'dd/MM/yyyy')}"></strong>
                     </div>
 
                 </div>
@@ -141,46 +141,6 @@
 
     </div>
 
-<!--    <div class="card shadow-lg mt-5 border-0">-->
-
-<!--        <div class="card-header bg-secondary text-white">-->
-
-<!--            Previous Reports-->
-
-<!--        </div>-->
-
-<!--        <div class="card-body">-->
-
-<!--&lt;!&ndash;            <table class="table table-hover">&ndash;&gt;-->
-
-<!--&lt;!&ndash;                <thead>&ndash;&gt;-->
-
-<!--&lt;!&ndash;                <tr>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <th>Period</th>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <th>Generated</th>&ndash;&gt;-->
-<!--&lt;!&ndash;                </tr>&ndash;&gt;-->
-
-<!--&lt;!&ndash;                </thead>&ndash;&gt;-->
-
-<!--&lt;!&ndash;                <tbody>&ndash;&gt;-->
-
-<!--&lt;!&ndash;                <tr th:each="summary : ${summaryResponses}">&ndash;&gt;-->
-
-<!--&lt;!&ndash;                    <td>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <span th:text="${#temporals.format(summary.start, 'dd/MM/yyyy')}"></span>&ndash;&gt;-->
-<!--&lt;!&ndash;                        - &ndash;&gt;-->
-<!--&lt;!&ndash;                        <span th:text="${#temporals.format(summary.end, 'dd/MM/yyyy')}"></span>&ndash;&gt;-->
-<!--&lt;!&ndash;                    </td>&ndash;&gt;-->
-
-<!--&lt;!&ndash;                    <td th:text="${#temporals.format(summary.generatedAt, 'dd/MM/yyyy')}"></td>&ndash;&gt;-->
-
-<!--&lt;!&ndash;                </tr>&ndash;&gt;-->
-
-<!--&lt;!&ndash;                </tbody>&ndash;&gt;-->
-
-<!--&lt;!&ndash;            </table>&ndash;&gt;-->
-
-<!--        </div>-->
 
     </div>
 

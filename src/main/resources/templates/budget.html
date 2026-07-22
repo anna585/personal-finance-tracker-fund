@@ -31,23 +31,25 @@
 
     <section class="budget-header">
         <h1>Monthly Budget</h1>
+        <span th:text="${budget.month}"></span>
+        <span th:text="' ' + ${budget.year}"></span>
     </section>
 
     <section class="budget-cards">
 
-        <div class="budget-card" th:action="@{/dashboard}">
+        <div class="budget-card budget" th:action="@{/dashboard}">
             <h3 >Total Budget</h3>
-            <span th:text="'€ ' + ${#numbers.formatDecimal(budget.monthlyLimit, 1, 2)}"></span>
+            <span th:text="${@currencyFormatter.format(budget.monthlyLimit)}"></span>
         </div>
 
         <div class="budget-card spent">
             <h3>Spent</h3>
-            <span th:text="'€ ' + ${#numbers.formatDecimal(spent, 1, 2)}"></span>
+            <span th:text="${@currencyFormatter.format(spent)}"></span>
         </div>
 
         <div class="budget-card remaining">
             <h3>Remaining</h3>
-            <span th:text="'€ ' + ${#numbers.formatDecimal(remaining, 1, 2)}"></span>
+            <span th:text="${@currencyFormatter.format(remaining)}"></span>
         </div>
 
     </section>

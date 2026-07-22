@@ -51,13 +51,13 @@
 
             <div class="goal-info">
                 <span>Target:</span>
-                <strong th:text="${goal.targetAmount}">
+                <strong th:text="${@currencyFormatter.format(goal.targetAmount)}">
                 </strong>
             </div>
 
             <div class="goal-info">
                 <span>Saved:</span>
-                <strong th:text="${goal.currentAmount}">
+                <strong th:text="${@currencyFormatter.format(goal.currentAmount)}">
                 </strong>
             </div>
 

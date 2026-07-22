@@ -59,9 +59,9 @@
 
                 <tbody>
 
-                <tr th:each="report : ${responseList}">
+                <tr th:each="report : ${reportHistory}">
 
-                    <td th:text="${#temporals.format(report.generatedAt,'dd/MM/yyyy')}"></td>
+                    <td th:text="${#temporals.format(report.generatedAt,'dd/MM/yyyy hh:mm')}"></td>
                     <td class="text-success fw-bold" th:text="'€ ' + ${report.income}"></td>
                     <td class="text-danger fw-bold" th:text="'€ ' + ${report.expenses}"></td>
                     <td th:text="'€ ' + ${report.balance}"></td>

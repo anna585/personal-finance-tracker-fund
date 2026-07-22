@@ -12,7 +12,7 @@
 
     <div class="auth-card">
 
-        <h1>Welcome</h1>
+        <h1>Welcome Back! <br> 📊 Finance Tracker</h1>
 
         <form th:action="@{/login}" th:object="${userLoginRequest}" th:method="post">
 
@@ -23,13 +23,11 @@
             <div class="form-group">
                 <label>Username</label>
                 <input type="text" name="username" placeholder="Enter username" th:field="*{username}">
-                <p class="alert-warning" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
             </div>
 
             <div class="form-group">
                 <label>Password</label>
                 <input type="password" name="password" placeholder="Enter password" th:field="*{password}">
-                <p class="alert-warning" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
             </div>
 
             <button type="submit" class="auth-btn">
