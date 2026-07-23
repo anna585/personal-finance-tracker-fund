@@ -36,20 +36,54 @@ body{
     padding:30px 60px;
 }
 
-.add-btn, .delete-btn, .edit-btn{
+.action-buttons {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 10px;
+}
+
+.action-buttons form {
+    margin: 0;
+}
+
+.edit-btn,
+.delete-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.edit-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #2980b9;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+}
+
+.add-btn{
     background:#27ae60;
     color:white;
     padding:12px 20px;
     text-decoration:none;
     border-radius:8px;
-}
-
-
-.edit-btn{
-    background: #4364ed;
-}
-.delete-btn{
-    background: #ef4444;
 }
 
 .transactions-table{
