@@ -3,7 +3,6 @@ package app.web.controllers.analytics;
 import app.analytics.dto.ReportRequest;
 import app.analytics.dto.ReportResponse;
 import app.analytics.service.ReportService;
-import app.mapper.transaction.TransactionMapper;
 import app.services.transaction.TransactionService;
 import app.web.dto.transaction.TransactionDto;
 import app.web.dto.user.AuthenticationUserDetails;
@@ -11,12 +10,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.LocalTime;
 import java.util.List;
 
 
@@ -41,29 +42,35 @@ public class ReportController {
     @PostMapping
     public ModelAndView generateReport(
             @Valid @ModelAttribute ReportRequest request,
+            BindingResult bindingResult,
             @AuthenticationPrincipal AuthenticationUserDetails principal){
+
+        if (bindingResult.hasErrors()) {
+            return new ModelAndView("budget-reports")
+                    .addObject("request", request);
+        }
 
         List<TransactionDto> transactions =
                 transactionService.getTransactionForReport(
                         principal.getId(),
-                        request.getStart(),
-                        request.getEnd()).stream().map(TransactionMapper::toDto).toList();
+                        request.getStart().atStartOfDay(),
+                        request.getEnd().atTime(LocalTime.MAX))
+                        .stream()
+                        .toList();
 
 
         ReportRequest reportRequest = ReportRequest.builder()
-                .userId(principal.getId().toString())
+                .userId(principal.getId())
                 .start(request.getStart())
                 .end(request.getEnd())
                 .transactions(transactions)
                 .build();
 
-        ReportResponse reports = reportService.generateReport(reportRequest);
+        ReportResponse report = reportService.generateReport(reportRequest);
 
-        ModelAndView modelAndView = new ModelAndView("budget-reports");
-        modelAndView.addObject("request", request);
-        modelAndView.addObject("reports", reports);
-        System.out.println(reports);
-        return modelAndView;
+        return  new ModelAndView("budget-reports")
+                .addObject("request", request)
+                .addObject("report", report);
     }
 
 }
