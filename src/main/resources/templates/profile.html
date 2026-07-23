@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | FinanceTracker</title>
+    <link rel="stylesheet" href="/css/profile.css">
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <h2 class="logo">FinanceTracker</h2>
+
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/transactions">Transactions</a>
+            <a href="/budget">Budget</a>
+            <a href="/savings">Savings</a>
+            <a href="/report-history">Report History</a>
+            <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <a href="/admin/users">Users</a>
+                <span> | </span>
+                <a href="/admin/statistics">Statistics</a>
+            </div>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+</header>
+
+<div class="profile-container">
+
+    <div class="profile-card">
+
+        <div class="profile-avatar"
+              th:text="${user.username.substring(0,1).toUpperCase()}">
+        </div>
+
+
+        <h2 class="profile-title">
+            My Profile
+        </h2>
+
+
+        <form th:action="@{/profile}"
+              th:object="${userProfileDto}"
+              th:method="post" onsubmit="return confirm('Are you sure that you want to change the profile information?')">
+
+
+            <div class="profile-info">
+                <label>Username</label>
+                <input th:field="*{username}" readonly>
+            </div>
+
+            <div class="profile-info">
+                <label>First Name</label>
+                <input th:field="*{firstName}">
+                <p class="alert-warning" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></p>
+            </div>
+
+            <div class="profile-info">
+                <label>Last Name</label>
+                <input th:field="*{lastName}">
+                <p class="alert-warning" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></p>
+            </div>
+
+            <div class="profile-info">
+                <label>Email</label>
+                <input th:field="*{email}">
+                <p class="alert-warning" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+            </div>
+
+
+            <div class="profile-info">
+                <label>Password</label>
+                <input type="password"
+                       th:field="*{password}">
+                <p class="alert-warning" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+            </div>
+
+
+            <button class="profile-button" type="submit">
+                Save changes
+            </button>
+            <p class="success-message" th:if="${param.success}"> Profile information updated successfully.</p>
+
+        </form>
+
+        <div class="profile-role">
+            Role:
+            <span th:classappend="${user.userRole == 'ADMIN'} ? 'role-admin' : 'role-user'"
+                  th:text="${user.userRole}">
+            </span>
+        </div>
+
+
+    </div>
+
+</div>
