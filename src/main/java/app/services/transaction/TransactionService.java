@@ -1,5 +1,9 @@
 package app.services.transaction;
 
+import app.exeption.budget.BudgetNotEnoughException;
+import app.exeption.budget.BudgetNotFoundException;
+import app.exeption.transaction.TransactionNotFoundException;
+import app.exeption.user.UserNotFoundException;
 import app.mapper.transaction.TransactionMapper;
 import app.mapper.user.UserMapper;
 import app.web.dto.transaction.TransactionDto;
@@ -15,18 +19,17 @@ import app.repositories.transaction.TransactionRepository;
 
 import app.repositories.user.UserRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class TransactionService {
 
@@ -35,21 +38,19 @@ public class TransactionService {
     private final UserRepository userRepository;
     private final SavingRepository savingRepository;
 
-
+    @Transactional
     public UserDto createNewTransaction(UUID id, TransactionRequest transactionRequest) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime createAt = LocalDateTime.now();
 
         User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found!"));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
-        Budget budget = budgetRepository.findByUserAndMonthAndYear(user, now.getMonth(), now.getYear())
-                .orElseThrow(() ->
-                        new RuntimeException("No budget found. Please create a budget first."));
+        Budget budget = budgetRepository.findByUserAndMonthAndYear(user, createAt.getMonth(), createAt.getYear())
+                .orElseThrow(() -> new BudgetNotFoundException(id));
 
 
         if(budget.getMonthlyLimit().compareTo(transactionRequest.getAmount()) < 0 && transactionRequest.getType().equals(TransactionType.EXPENSE)){
-            throw new RuntimeException("The monthly budget is not sufficient to create this transaction.");
+            throw new BudgetNotEnoughException();
         }
 
         Transaction transaction = Transaction.builder()
@@ -57,66 +58,87 @@ public class TransactionService {
                 .amount(transactionRequest.getAmount())
                 .type(transactionRequest.getType())
                 .categoryType(transactionRequest.getCategory())
-                .date(LocalDate.now())
+                .createdAt(LocalDateTime.now())
                 .build();
 
         transactionRepository.save(transaction);
 
+        log.info("Creating transaction for user {}", user.getId());
+
         return UserMapper.toUserDto(user);
     }
 
-    public BigDecimal getTotalSpentByUser(UUID userId) {
+    public BigDecimal getTotalSpentByUser(UUID id) {
 
-       return transactionRepository.getTotalSpentByUser(userId) != null
-               ? transactionRepository.getTotalSpentByUser(userId)
+       return transactionRepository.getTotalSpentByUser(id) != null
+               ? transactionRepository.getTotalSpentByUser(id)
                : BigDecimal.ZERO;
     }
 
-    public BigDecimal getTotalIncomeByUser(UUID userId) {
-
-        return transactionRepository.getTotalIncomeByUser(userId) != null
-                ? transactionRepository.getTotalIncomeByUser(userId)
-                : BigDecimal.ZERO;
-    }
-
+    @Transactional
     public void deleteTransaction(UUID id) {
+
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new TransactionNotFoundException(id));
 
         savingRepository.findByTransactionId(id)
                 .ifPresent(savingRepository::delete);
 
-        transactionRepository.deleteById(id);
+        transactionRepository.delete(transaction);
+
+        log.info("Deleting transaction for user with id: {}", id);
     }
 
     public List<Transaction> getAllTransactionsByUser(UUID id) {
 
-        return transactionRepository.findAllByUserIdOrderByDateDesc(id);
+        return transactionRepository.findAllByUserIdOrderByCreatedAtDesc(id);
     }
 
-    public List<Transaction> getTransactionForReport(UUID userId, LocalDate start, LocalDate end ) {
-        return transactionRepository
-                .findByUserIdAndDateBetween(userId, start, end);
+    public List<TransactionDto> getTransactionForReport(UUID id, LocalDateTime start, LocalDateTime end ) {
+
+        List<Transaction> transaction = transactionRepository
+                .findByUserIdAndCreatedAtBetween(id, start, end);
+        return transaction
+                .stream()
+                .map(TransactionMapper::toDto)
+                .toList();
     }
 
     public TransactionDto getTransactionById(UUID id) {
 
-        Transaction transaction = transactionRepository.findTransactionById(id);
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new TransactionNotFoundException(id));
 
         return TransactionMapper.toDto(transaction);
     }
 
+    @Transactional
     public TransactionDto updateTransaction(UUID id, TransactionRequest transactionRequest) {
 
         Transaction transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction with id [%s] does not exist".formatted(id)));
+                .orElseThrow(() -> new TransactionNotFoundException(id));
 
         transaction.setAmount(transactionRequest.getAmount());
         transaction.setType(transactionRequest.getType());
-        transaction.setCategoryType(transaction.getCategoryType());
-        transaction.setDate(transaction.getDate());
+        transaction.setCategoryType(transactionRequest.getCategory());
+        transaction.setCreatedAt(LocalDateTime.now());
 
 
         transactionRepository.save(transaction);
 
+        log.info("Updating transaction for user with id: {}", id);
+
         return TransactionMapper.toDto(transaction);
     }
+
+    public List<TransactionDto> getTop5Transactions(UUID id){
+
+        return transactionRepository
+                .findTop5ByUserIdOrderByCreatedAtDesc(id)
+                .stream()
+                .map(TransactionMapper::toDto)
+                .toList();
+    }
+
+
 }
