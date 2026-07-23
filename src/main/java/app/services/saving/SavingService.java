@@ -1,5 +1,11 @@
 package app.services.saving;
 
+import app.exeption.user.InvalidUuidException;
+import app.exeption.budget.BudgetNotEnoughException;
+import app.exeption.budget.BudgetNotFoundException;
+import app.exeption.budget.MonthlyBudgetExceededException;
+import app.exeption.savings.SavingGoalNotFoundException;
+import app.exeption.user.*;
 import app.mapper.saving.SavingGoalsMapper;
 import app.mapper.user.UserMapper;
 import app.web.dto.saving.EditSavingRequest;
@@ -20,6 +26,7 @@ import app.services.transaction.TransactionService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 
@@ -29,8 +36,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class SavingService {
 
@@ -42,26 +49,39 @@ public class SavingService {
 
     public SavingGoalsDto getSavingGoalById(UUID id) {
 
-        return savingRepository.findById(id)
-                .map(SavingGoalsMapper::toDto)
-                .orElse(null);
+        SavingGoal savingGoal = savingRepository.findById(id)
+                .orElseThrow(() -> new SavingGoalNotFoundException(id));
+
+        return SavingGoalsMapper.toDto(savingGoal);
     }
 
+    @Transactional
     public void deleteSavingGoal(UUID id) {
 
-        savingRepository.deleteById(id);
+        SavingGoal savingGoal = savingRepository.findById(id)
+                .orElseThrow(() -> new SavingGoalNotFoundException(id));
+
+        savingRepository.delete(savingGoal);
+
+        log.info("Delete saving goal with id {}", id);
     }
 
-    public UserDto createGoals(UUID userId, @Valid SavingRequest savingRequest) {
+    @Transactional
+    public UserDto createGoal(UUID userId, @Valid SavingRequest savingRequest) {
+
+        if(savingRequest.getTargetDate().isBefore(LocalDate.now())){
+            throw new TargetDateInPastException();
+        }
+
         LocalDateTime now = LocalDateTime.now();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found!"));
+                        new UserNotFoundException(userId));
 
         Budget budget = budgetRepository.findByUserAndMonthAndYear(user, now.getMonth(), now.getYear())
                 .orElseThrow(() ->
-                        new RuntimeException("No budget found. Please create a budget first."));
+                        new BudgetNotFoundException(userId));
 
         BigDecimal spent = transactionService.getTotalSpentByUser(userId);
         BigDecimal remaining =budget.getMonthlyLimit().subtract(spent);
@@ -70,9 +90,9 @@ public class SavingService {
         BigDecimal currentAmountAndAutoSave = savingRequest.getCurrentAmount().add(autoSave);
 
         if(remaining.compareTo(autoSave) < 0){
-            throw new IllegalArgumentException("The monthly budget is not sufficient to create this savings goal.");
+            throw new BudgetNotEnoughException();
         } else if (remaining.compareTo(currentAmountAndAutoSave) < 0) {
-            throw new IllegalArgumentException("The entered amount exceeds the remaining monthly budget.");
+            throw new MonthlyBudgetExceededException();
         }
 
         Transaction transaction = Transaction.builder()
@@ -80,7 +100,7 @@ public class SavingService {
                 .amount(currentAmountAndAutoSave)
                 .type(TransactionType.EXPENSE)
                 .categoryType(CategoryType.SAVING)
-                .date(LocalDate.now())
+                .createdAt(LocalDateTime.now())
                 .build();
         transactionRepository.save(transaction);
 
@@ -99,6 +119,8 @@ public class SavingService {
         user.getSavingGoals().add(savingGoal);
         userRepository.save(user);
 
+        log.info("Creating saving goal with id {}", savingGoal.getId());
+
         return UserMapper.toUserDto(user);
 
     }
@@ -108,10 +130,15 @@ public class SavingService {
         return savingRepository.findAllByUserId(userId);
     }
 
-    public SavingGoalsDto updateSavingGoals(UUID id, EditSavingRequest editSavingRequest) {
+    @Transactional
+    public SavingGoalsDto updateSavingGoal(UUID id, EditSavingRequest editSavingRequest) {
+
+        if (editSavingRequest.getTargetDate().isBefore(LocalDate.now())) {
+            throw new TargetDateInPastException();
+        }
 
         SavingGoal savingEntity = savingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("SavingGoal with id [%s] does not exist".formatted(id)));
+                .orElseThrow(() -> new InvalidUuidException());
 
         Transaction transaction = savingEntity.getTransaction();
 
@@ -123,6 +150,8 @@ public class SavingService {
         savingEntity.setCurrentAmount(editSavingRequest.getCurrentAmount());
         savingEntity.setTargetDate(editSavingRequest.getTargetDate());
         savingRepository.save(savingEntity);
+
+        log.info("Updating saving goal with name {}", editSavingRequest.getGoalName());
 
         return SavingGoalsMapper.toDto(savingEntity);
     }

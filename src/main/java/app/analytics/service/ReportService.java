@@ -4,6 +4,7 @@ import app.analytics.client.TransactionClient;
 import app.analytics.dto.ReportRequest;
 import app.analytics.dto.ReportResponse;
 import feign.FeignException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,11 @@ public class ReportService {
 
     private final TransactionClient client;
 
+    @Transactional
     public ReportResponse generateReport(ReportRequest reportRequest) {
+
+        log.info("Generating report for user {}", reportRequest.getUserId());
+
         ReportRequest dto = ReportRequest.builder()
                 .userId(reportRequest.getUserId())
                 .start(reportRequest.getStart())
@@ -28,7 +33,9 @@ public class ReportService {
                 .build();
 
         try {
-           return client.postReport(dto);
+
+           return client.generateReport(dto);
+
         } catch (FeignException e) {
             log.error("Analytics service returned {}", e.status(), e);
             throw e;
@@ -38,12 +45,12 @@ public class ReportService {
 
     public List<ReportResponse> getReportHistory(UUID userId) {
 
-        return client.getHistory(String.valueOf(userId));
+        return client.getHistory(String.valueOf(userId)).getBody();
     }
 
     public void deleteReport(UUID reportId) {
 
-        client.deleteReport(String.valueOf(reportId));
+        client.deleteReport(reportId);
 
     }
 }
