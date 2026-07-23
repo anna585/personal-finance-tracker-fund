@@ -18,7 +18,7 @@ public class TransactionMapper {
                 .id(transaction.getId())
                 .amount(transaction.getAmount())
                 .type(transaction.getType())
-                .date(transaction.getDate())
+                .createAt(transaction.getCreatedAt())
                 .category(transaction.getCategoryType())
                 .build();
 

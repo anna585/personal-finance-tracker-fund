@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
@@ -26,7 +26,8 @@ public class Transaction {
     private TransactionType type;
     @Enumerated(EnumType.STRING)
     private CategoryType categoryType;
-    private LocalDate date;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

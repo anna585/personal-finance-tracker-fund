@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
@@ -23,7 +23,7 @@ public class TransactionDto {
     @NotBlank(message = "Please enter type of the transaction.")
     private TransactionType type;
     @NotNull(message = "Target date is required")
-    private LocalDate date;
+    private LocalDateTime createAt;
     @NotBlank(message = "Please enter category of the transaction.")
     private CategoryType category;
 }

@@ -1,10 +1,11 @@
 package app.analytics.dto;
 
+import app.model.entities.transaction.CategoryType;
 import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -15,8 +16,8 @@ public class ReportResponse {
     private BigDecimal income;
     private BigDecimal expenses;
     private BigDecimal balance;
-    private String largestExpense;
+    private CategoryType largestExpense;
     private BigDecimal savingRate;
-    private LocalDate generatedAt;
+    private LocalDateTime generatedAt;
 }
 
