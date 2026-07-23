@@ -9,6 +9,7 @@ import app.repositories.budget.BudgetRepository;
 import app.services.transaction.TransactionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,8 +17,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class BudgetService {
 
@@ -25,6 +26,7 @@ public class BudgetService {
     private final TransactionService transactionService;
 
 
+    @Transactional
     public Budget createDefaultBudget(User user){
 
         LocalDateTime now = LocalDateTime.now();
@@ -36,11 +38,12 @@ public class BudgetService {
                 .year(now.getYear())
                 .build();
 
-        budgetRepository.save(budget);
+        log.info("Generating budget for user {}, {} month, {} year", user, now.getMonth(), now.getYear());
 
-        return budget;
+        return budgetRepository.save(budget);
     }
 
+    @Transactional
     public BudgetDto updateMonthlyBudget(User user, MonthlyBudgetRequest monthlyBudgetRequest) {
 
         LocalDateTime now = LocalDateTime.now();
@@ -60,31 +63,15 @@ public class BudgetService {
                     .month(now.getMonth())
                     .year(now.getYear())
                     .build();
-
         }
 
-        budgetRepository.save(budget);
-
-
-        return BudgetMapper.toDto(budget);
-    }
-
-    public BudgetDto getCurrentBudget(User user) {
-
-        LocalDateTime now = LocalDateTime.now();
-
-        Budget budget = budgetRepository
-                .findByUserAndMonthAndYear(
-                        user,
-                        now.getMonth(),
-                        now.getYear())
-                .orElseGet(() ->
-                        createBudgetForCurrentMonth(user, now));
+        log.info("Updating budget for user {}",user);
 
         return BudgetMapper.toDto(budget);
     }
 
-    private Budget createBudgetForCurrentMonth(User user, LocalDateTime now) {
+    @Transactional
+    public Budget createDefaultBudget(User user, LocalDateTime now) {
 
         Budget budget = new Budget();
         budget.setUser(user);
@@ -101,15 +88,34 @@ public class BudgetService {
         if (budget.getMonthlyLimit() == null){
             budget.setMonthlyLimit(BigDecimal.ZERO);
         }
+
+        log.info("Create budget for user {}",user);
+
        return budgetRepository.save(budget);
     }
 
+    public BudgetDto getCurrentBudget(User user) {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        Budget budget = budgetRepository
+                .findByUserAndMonthAndYear(
+                        user,
+                        now.getMonth(),
+                        now.getYear())
+                .orElseGet(() ->
+                        createDefaultBudget(user, now));
+
+        return BudgetMapper.toDto(budget);
+    }
 
     public BigDecimal calculateRemainingBudget(User user) {
 
         BudgetDto budget = getCurrentBudget(user);
         BigDecimal spent = transactionService.getTotalSpentByUser(user.getId());
 
-        return  budget.getMonthlyLimit().subtract(spent);
+        return  budget.getMonthlyLimit()
+                .subtract(spent)
+                .max(BigDecimal.ZERO);
     }
 }
