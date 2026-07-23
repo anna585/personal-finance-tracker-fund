@@ -25,7 +25,7 @@ public class SavingController {
     private final UserService userService;
     private final SavingService savingService;
 
-    public ModelAndView populateSavingGoals(ModelAndView modelAndView,
+    private ModelAndView populateSavingGoals(ModelAndView modelAndView,
                                             SavingRequest savingRequest,
                                             UserDto user){
 
@@ -36,7 +36,7 @@ public class SavingController {
     }
 
     @GetMapping
-    public ModelAndView savingsGoals(@AuthenticationPrincipal AuthenticationUserDetails principal) {
+    public ModelAndView getSavings(@AuthenticationPrincipal AuthenticationUserDetails principal) {
 
         UserDto user = userService.getById(principal.getId());
 
@@ -50,7 +50,7 @@ public class SavingController {
     }
 
     @GetMapping("/add")
-    public ModelAndView getAddingGoals(@AuthenticationPrincipal AuthenticationUserDetails principal){
+    public ModelAndView getAddSavingGoal(@AuthenticationPrincipal AuthenticationUserDetails principal){
 
         UserDto user = userService.getById(principal.getId());
 
@@ -60,7 +60,7 @@ public class SavingController {
     }
 
     @PostMapping("/add")
-    public ModelAndView postAddingGoals(@Valid @ModelAttribute SavingRequest savingRequest,
+    public ModelAndView addSavingGoal(@Valid @ModelAttribute SavingRequest savingRequest,
                                         BindingResult bindingResult,
                                         @AuthenticationPrincipal AuthenticationUserDetails principal){
 
@@ -72,30 +72,13 @@ public class SavingController {
                     user);
         }
 
-        try {
-            savingService.createGoals(user.getId(), savingRequest);
-
-        } catch (IllegalArgumentException ex) {
-
-            return new ModelAndView("savings")
-                    .addObject("user", user)
-                    .addObject("savingGoals",
-                    savingService.getAllSavingGoalsByUser(user.getId()))
-                    .addObject("errorMessage", ex.getMessage());
-        }
-
+        savingService.createGoal(user.getId(), savingRequest);
 
         return new ModelAndView("redirect:/savings");
     }
 
     @PostMapping("/{id}/delete")
     public ModelAndView deleteSavingGoal(@PathVariable UUID id){
-
-        SavingGoalsDto savingGoal = savingService.getSavingGoalById(id);
-
-        if(savingGoal == null){
-            throw new RuntimeException("The Saving goal is not found!");
-        }
 
         savingService.deleteSavingGoal(id);
         return new ModelAndView("redirect:/savings");
@@ -120,7 +103,7 @@ public class SavingController {
     }
 
     @PostMapping("/{id}/edit")
-    public ModelAndView editSavingGoals(
+    public ModelAndView updateSavingGoal(
             @PathVariable UUID id,
             @Valid @ModelAttribute EditSavingRequest editSavingRequest,
             BindingResult bindingResult){
@@ -131,7 +114,7 @@ public class SavingController {
                     .addObject("goalId", id);
         }
 
-        savingService.updateSavingGoals(id, editSavingRequest);
+        savingService.updateSavingGoal(id, editSavingRequest);
 
         return new ModelAndView("redirect:/savings");
     }

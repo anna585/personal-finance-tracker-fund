@@ -24,7 +24,7 @@ public class TransactionController {
     private final UserService userService;
     private final TransactionService transactionService;
 
-    public ModelAndView populateTransaction(ModelAndView modelAndView,
+    private ModelAndView populateTransaction(ModelAndView modelAndView,
                                             TransactionRequest transactionRequest,
                                             UserDto user){
 
@@ -68,19 +68,8 @@ public class TransactionController {
                     user);
         }
 
-        try{
             transactionService.createNewTransaction(user.getId(), transactionRequest);
             return new ModelAndView("redirect:/transactions?success");
-
-        }catch (RuntimeException ex){
-
-            return new ModelAndView("transactions")
-                    .addObject("user", user)
-                    .addObject("transactions",
-                    transactionService.getAllTransactionsByUser(user.getId()))
-                    .addObject("transactionRequest", transactionRequest)
-                    .addObject("error", ex.getMessage());
-        }
 
     }
 
@@ -94,7 +83,7 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}/edit")
-    public ModelAndView getEditTransaction(@PathVariable UUID id) {
+    public ModelAndView updateTransaction(@PathVariable UUID id) {
 
         TransactionDto transaction = transactionService.getTransactionById(id);
 

@@ -23,11 +23,11 @@ public class StatisticController {
     @GetMapping
     public ModelAndView getStatistics(){
 
-        StatisticResponse statisticResponse = statisticService.getAllUsersForStatistic();
+        StatisticResponse statistics = statisticService.getAllUsersForStatistic();
 
 
         return new ModelAndView("statistics")
-                .addObject("statisticResponse", statisticResponse)
+                .addObject("statistics", statistics)
                 .addObject("users", userService.getAllUsers());
     }
 

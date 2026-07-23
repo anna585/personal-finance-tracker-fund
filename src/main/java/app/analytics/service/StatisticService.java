@@ -17,11 +17,12 @@ public class StatisticService {
     private final UserService userService;
     private final TransactionClient client;
 
+
     @PreAuthorize("hasRole('ADMIN')")
     public StatisticResponse getAllUsersForStatistic() {
 
         List<UserDto> userList = userService.getAllUsers();
 
-        return  client.getStatisticForAllUsers(userList);
+        return  client.postStatisticForAllUsers(userList);
     }
 }

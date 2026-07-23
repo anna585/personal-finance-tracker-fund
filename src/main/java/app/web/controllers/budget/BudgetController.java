@@ -30,16 +30,12 @@ public class BudgetController {
     private final BudgetService budgetService;
     private final TransactionService transactionService;
 
-    public ModelAndView populateBudgetPage(ModelAndView modelAndView,
-                                           MonthlyBudgetRequest monthlyBudgetRequest,
-                                           User user,
-                                           UUID userId){
+     private ModelAndView populateBudgetPage(ModelAndView modelAndView,
+                                             MonthlyBudgetRequest monthlyBudgetRequest,
+                                             User user,
+                                             UUID userId){
 
         BudgetDto budget = budgetService.getCurrentBudget(user);
-
-        if(budget == null){
-            throw new RuntimeException("Please enter monthly budget!");
-        }
 
         BigDecimal spent = transactionService.getTotalSpentByUser(userId);
         BigDecimal remaining = budgetService.calculateRemainingBudget(user);
@@ -54,7 +50,7 @@ public class BudgetController {
     }
 
     @GetMapping
-    public ModelAndView getMonthlyBudgetRequest(@AuthenticationPrincipal AuthenticationUserDetails principal){
+    public ModelAndView getBudget(@AuthenticationPrincipal AuthenticationUserDetails principal){
 
         User user = userService.getEntityById(principal.getId());
 
@@ -65,7 +61,7 @@ public class BudgetController {
     }
 
     @PostMapping
-    public ModelAndView postMonthlyBudgetRequest(@Valid @ModelAttribute MonthlyBudgetRequest monthlyBudgetRequest,
+    public ModelAndView updateBudget(@Valid @ModelAttribute MonthlyBudgetRequest monthlyBudgetRequest,
                                                  BindingResult bindingResult,
                                                  @AuthenticationPrincipal AuthenticationUserDetails principal){
         User user = userService.getEntityById(principal.getId());
