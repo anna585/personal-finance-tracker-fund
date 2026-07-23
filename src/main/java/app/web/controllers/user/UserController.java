@@ -1,20 +1,13 @@
 package app.web.controllers.user;
 
-import app.web.dto.user.UserDto;
-import app.web.dto.user.UserLoginRequest;
-import app.web.dto.user.UserRegisterRequest;
-import app.services.budget.BudgetService;
-import app.services.saving.SavingService;
-import app.services.transaction.TransactionService;
+import app.web.dto.user.*;
 import app.services.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 
@@ -22,22 +15,25 @@ import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
-public class UserController {
+public class  UserController {
 
     private final UserService userService;
-    private final TransactionService transactionService;
-    private final BudgetService budgetService;
-    private final SavingService savingService;
 
 
     @GetMapping("/login")
-    public ModelAndView getLogin() {
+    public ModelAndView getLogin(@RequestParam(required = false) String error) {
 
         UserLoginRequest userLoginRequest = UserLoginRequest.builder().build();
 
-        return new ModelAndView("login")
-                .addObject("userLoginRequest", userLoginRequest);
+        ModelAndView modelAndView = new ModelAndView("login");
+        modelAndView.addObject("userLoginRequest", userLoginRequest);
+
+        if(error != null){
+         modelAndView.addObject("error", "Invalid username or password.");
+        }
+        return modelAndView;
     }
+
 
     @GetMapping("/register")
     public ModelAndView getRegister() {
@@ -52,7 +48,8 @@ public class UserController {
     public ModelAndView postRegister(@Valid @ModelAttribute UserRegisterRequest userRegisterRequest,
                                      BindingResult bindingResult){
         if(bindingResult.hasErrors()){
-            return new ModelAndView("register");
+            return new ModelAndView("register")
+                    .addObject("userRegisterRequest", userRegisterRequest);
         }
 
             userService.register(userRegisterRequest);
@@ -70,22 +67,44 @@ public class UserController {
     @PostMapping("/users/{id}/delete")
     public ModelAndView deleteUser(@PathVariable UUID id){
 
-        UserDto user = userService.getById(id);
-
-        if(user == null){
-            return new ModelAndView("redirect:/admin/users");
-        }
-
-        try {
             userService.deleteUser(id);
             return new ModelAndView("redirect:/admin/users");
 
-        } catch (RuntimeException e) {
+    }
 
-            return new ModelAndView("users")
-                    .addObject("error", e.getMessage());
+    @GetMapping("/profile")
+    public ModelAndView getProfile(@AuthenticationPrincipal AuthenticationUserDetails principal){
+
+        UserDto user = userService.getById(principal.getId());
+        UserProfileDto userProfileDto = UserProfileDto.builder()
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .userRole(user.getUserRole())
+                .password(user.getPassword())
+                .build();
+
+        return new ModelAndView("profile")
+                .addObject("user", user)
+                .addObject("userProfileDto", userProfileDto);
+    }
+
+    @PostMapping("/profile")
+    public ModelAndView updateProfile(@Valid @ModelAttribute UserProfileDto userProfileDto,
+                                      BindingResult bindingResult,
+                                      @AuthenticationPrincipal AuthenticationUserDetails principal){
+
+        UserDto user = userService.updateProfileInformation(principal.getId(), userProfileDto);
+
+        if(bindingResult.hasErrors()){
+            return new ModelAndView("profile")
+                    .addObject("userProfileDto", userProfileDto)
+                    .addObject("user", user);
         }
 
+        return new ModelAndView("redirect:/profile?success")
+                .addObject("user", user)
+                .addObject("userProfileDto", userProfileDto);
 
     }
 }
