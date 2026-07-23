@@ -19,6 +19,7 @@
             <a href="/budget">Budget</a>
             <a href="/savings">Savings</a>
             <a href="/report-history">Report History</a>
+            <a href="/profile">Profile</a>
             <div sec:authorize="hasRole('ROLE_ADMIN')">
                 <a href="/admin/users">Users</a>
                 <span> | </span>
@@ -35,28 +36,34 @@
         <h1>Welcome back,</h1>
         <h1 th:text="${user.firstName}"></h1>
         <p>Current Month Summary</p>
-
+        <span th:text="${date.month}"></span>
+        <span th:text="' ' + ${date.year}"></span>
     </section>
 
-    <section class="summary-cards">
-        <div class="card">
+    <div class="alert alert-warning" th:if="${analyticsAvailable != null}">
+        <span th:text="${analyticsMessage}"></span>
+    </div>
+
+    <section class="summary-cards" th:if="${analyticsAvailable}">
+
+        <div class="card current-balance">
             <h3>Current Balance</h3>
-            <span class="amount" th:text="'€ ' + ${#numbers.formatDecimal(summaryResponses.monthlyBalance, 1, 2)}" ></span>
+            <span class="amount" th:text=" ${@currencyFormatter.format(summary.monthlyBalance)}" ></span>
         </div>
 
         <div class="card income-card">
             <h3>Income</h3>
-            <span class="amount" th:text="'€ ' + ${#numbers.formatDecimal(summaryResponses.monthlyIncome, 1, 2)}"></span>
+            <span class="amount" th:text=" ${@currencyFormatter.format(summary.monthlyIncome)}"></span>
         </div>
 
         <div class="card expense-card">
             <h3>Expenses</h3>
-            <span class="amount" th:text="'€ ' + ${#numbers.formatDecimal(summaryResponses.monthlyExpense, 1, 2)}"></span>
+            <span class="amount" th:text=" ${@currencyFormatter.format(summary.monthlyExpense)}"></span>
         </div>
 
         <div class="card saving-card">
             <h3>Saving Rate</h3>
-            <span class="amount" th:text="${summaryResponses.monthlySavingRade} + ' %'"></span>
+            <span class="amount" th:text=" ${summary.monthlySavingRade} + ' %'"></span>
         </div>
 
     </section>
@@ -67,12 +74,44 @@
             Generate New Report
         </a>
 
-        <a href="/budget-reports" class="action-btn report-history-btn">
+        <a href="/report-history" class="action-btn report-history-btn">
             View Report History
         </a>
 
     </section>
 
+    <section class="transactions">
+
+        <h2>Last 5 Transactions</h2>
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Amount</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="transaction : ${transactionDtoList}">
+                <td th:text="${#temporals.format(transaction.createAt, 'dd/MM/yyyy hh:ss')}"></td>
+                <td th:text="${transaction.category}"></td>
+                <td th:text="${transaction.type}"></td>
+                <td>
+                    <p th:if="${transaction.type.name() == 'INCOME'}" class="income" th:text="'+ ' + ${@currencyFormatter.format(transaction.amount)}"></p>
+                    <p th:if="${transaction.type.name() == 'EXPENSE'}" class="expense" th:text="'- ' + ${@currencyFormatter.format(transaction.amount)}"></p>
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </section>
 
 </main>
 
