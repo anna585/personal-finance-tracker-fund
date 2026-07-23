@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Controller
-@RequestMapping("report-history")
+@RequestMapping("/report-history")
 @RequiredArgsConstructor
 public class ReportHistoryController {
 
@@ -25,17 +25,17 @@ public class ReportHistoryController {
     @GetMapping
     public ModelAndView getReportHistory(@AuthenticationPrincipal AuthenticationUserDetails principal){
 
-        List<ReportResponse> responseList = reportService.getReportHistory(principal.getId());
+        List<ReportResponse> reportHistory = reportService.getReportHistory(principal.getId());
 
         return new ModelAndView("report-history")
-                .addObject("responseList", responseList);
+                .addObject("reportHistory", reportHistory);
     }
 
     @PostMapping("/{reportId}")
     public ModelAndView deleteReport(@PathVariable UUID reportId){
 
         reportService.deleteReport(reportId);
-        return new ModelAndView("redirect:/dashboard");
+        return new ModelAndView("redirect:/report-history");
 
     }
 }
