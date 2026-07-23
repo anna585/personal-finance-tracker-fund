@@ -34,11 +34,14 @@ public class User {
     private UserRole userRole;
     private LocalDateTime createdOn;
     private LocalDateTime updatedOn;
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
-    @OrderBy("date DESC")
+    @OrderBy("createdAt DESC")
     private List<Transaction> transactions = new ArrayList<>();
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private List<Budget> budgets = new ArrayList<>();
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private List<SavingGoal> savingGoals = new ArrayList<>();
 }
