@@ -1,10 +1,12 @@
 package app.web.controllers;
 
 import app.exeption.ApplicationException;
+import app.exeption.user.InvalidUuidException;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
 
 
@@ -34,8 +36,13 @@ public class GlobalControllerAdvice {
         modelAndView.addObject("errorTitle", "Feign Exception");
         modelAndView.addObject("errorCode", ex.status());
 
-
         return modelAndView;
+    }
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ModelAndView handleMethodArgumentTypeMismatch(
+            MethodArgumentTypeMismatchException ex) {
+        log.error("ApplicationException occurred: {}", ex.getMessage(), ex);
+        return handleApplicationException(new InvalidUuidException());
     }
 
     @ExceptionHandler(Exception.class)
