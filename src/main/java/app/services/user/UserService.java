@@ -1,12 +1,10 @@
 package app.services.user;
 
-import app.exeption.AdminUserCanNotBeDelete;
-import app.exeption.EmailAlreadyExistsException;
-import app.exeption.UserNotFoundException;
-import app.exeption.UsernameAlreadyExistException;
+import app.exeption.user.*;
 import app.mapper.user.UserMapper;
 import app.web.dto.user.AuthenticationUserDetails;
 import app.web.dto.user.UserDto;
+import app.web.dto.user.UserProfileDto;
 import app.web.dto.user.UserRegisterRequest;
 import app.model.entities.budget.Budget;
 import app.model.entities.user.User;
@@ -14,7 +12,9 @@ import app.model.entities.user.UserRole;
 import app.repositories.user.UserRepository;
 import app.services.budget.BudgetService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
@@ -35,18 +35,16 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final BudgetService budgetService;
 
-
+    @Transactional
     public UserDto register(UserRegisterRequest userRegisterRequest){
 
         userRepository.findByUsername(userRegisterRequest.getUsername())
                 .ifPresent(user -> {
-                    throw new UsernameAlreadyExistException("User with username [%s] already exists!".formatted(userRegisterRequest.getUsername()));
+                    throw new UsernameAlreadyExistsException(userRegisterRequest.getUsername());
                 });
 
         if (userRepository.existsByEmail(userRegisterRequest.getEmail())) {
-            throw new EmailAlreadyExistsException(
-                    "User with email [%s] already exists!"
-                            .formatted(userRegisterRequest.getEmail()));
+            throw new EmailAlreadyExistsException(userRegisterRequest.getEmail());
         }
 
       String encodedPassword = passwordEncoder.encode(userRegisterRequest.getPassword());
@@ -61,13 +59,13 @@ public class UserService implements UserDetailsService {
         userEntity = userRepository.save(userEntity);
 
         Budget defaultBudget =  budgetService.createDefaultBudget(userEntity);
-        userEntity.setBudgets(new ArrayList<>(List.of(defaultBudget)));
+        userEntity.getBudgets().add(defaultBudget);
 
         userEntity.setSavingGoals(new ArrayList<>());
 
         userEntity.setTransactions(new ArrayList<>());
 
-        userRepository.save(userEntity);
+        log.info("Registering new user with username: {}", userRegisterRequest.getUsername());
 
         return UserMapper.toUserDto(userEntity);
     }
@@ -76,38 +74,75 @@ public class UserService implements UserDetailsService {
 
         User user = userRepository.findById(id)
                 .orElseThrow(
-                        () -> new UserNotFoundException("User with id [%s] does not exist.".formatted(id)));
+                        () -> new UserNotFoundException(id));
         return  UserMapper.toUserDto(user);
     }
 
     public User getEntityById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() ->
-                        new UserNotFoundException("User not found"));
+                        new UserNotFoundException(id));
     }
 
+    @Transactional
     public List<UserDto> getAllUsers() {
 
-        return userRepository.findAll().stream().map(UserMapper::toUserDto).toList();
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toUserDto)
+                .toList();
+
     }
 
+    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(UUID id) {
 
-        User user = userRepository.findUserById(id);
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new UserNotFoundException(id));
 
-        if(user.getUserRole().equals(UserRole.ADMIN)){
-            throw new AdminUserCanNotBeDelete("ADMIN users cannot be deleted!");
+        if(UserRole.ADMIN.equals(user.getUserRole())){
+            throw new AdminCannotBeDeletedException(id);
         }
+        log.info("Delete user with id {}", id);
 
-         userRepository.deleteById(id);
+        userRepository.deleteById(id);
+    }
+
+    @Transactional
+    public UserDto updateProfileInformation(UUID userId, @Valid UserProfileDto userProfileDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        boolean emailExist = userRepository.findAll()
+                .stream()
+                .anyMatch(u -> u.getEmail().equals(userProfileDto.getEmail())
+                        && !u.getId().equals(userId));
+
+        if(emailExist){
+
+            throw new EmailAlreadyExistsException(userProfileDto.getEmail());
+        }
+        String encodedPassword = passwordEncoder.encode(userProfileDto.getPassword());
+        user.setPassword(encodedPassword);
+        user.setFirstName(userProfileDto.getFirstName());
+        user.setLastName(userProfileDto.getLastName());
+        user.setEmail(userProfileDto.getEmail());
+        userRepository.save(user);
+
+        log.info("Updated profile for username {}", userProfileDto.getUsername());
+
+        return UserMapper.toUserDto(user);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username){
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User with username [%s] not found!".formatted(username)));
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+
+        log.info("Loading user by username: {}", username);
+
         return AuthenticationUserDetails.builder()
                 .id(user.getId())
                 .username(user.getUsername())
