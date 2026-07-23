@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @FeignClient(name = "budget-analytics-svc",
@@ -18,24 +19,24 @@ import java.util.List;
 public interface TransactionClient {
 
     @PostMapping("/api/v1/analytics/report")
-    ReportResponse postReport(
+    ReportResponse generateReport(
             @RequestBody ReportRequest reportRequest);
 
     @PostMapping("/api/v1/analytics/summary")
-    SummaryResponse getSummaryReport(
+    SummaryResponse generateSummary(
             @RequestBody List<TransactionDto> transactions);
 
 
 
-    @GetMapping("/api/v1/analystics/report-history")
-    List<ReportResponse> getHistory(
+    @GetMapping("/api/v1/analytics/report-history")
+    ResponseEntity<List<ReportResponse>> getHistory(
             @RequestParam String userId);
 
     @DeleteMapping("/api/v1/analytics/report-history/{reportId}")
-    ResponseEntity<Void> deleteReport(@PathVariable String reportId);
+    ResponseEntity<Void> deleteReport(@PathVariable UUID reportId);
 
 
     @PostMapping("/api/v1/analytics/statistic")
-    StatisticResponse getStatisticForAllUsers(
+    StatisticResponse postStatisticForAllUsers(
             @RequestBody List<UserDto> userList);
 }
