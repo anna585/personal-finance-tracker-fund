@@ -2,10 +2,7 @@ package app.services.user;
 
 import app.exeption.user.*;
 import app.mapper.user.UserMapper;
-import app.web.dto.user.AuthenticationUserDetails;
-import app.web.dto.user.UserDto;
-import app.web.dto.user.UserProfileDto;
-import app.web.dto.user.UserRegisterRequest;
+import app.web.dto.user.*;
 import app.model.entities.budget.Budget;
 import app.model.entities.user.User;
 import app.model.entities.user.UserRole;
@@ -22,7 +19,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,20 +50,16 @@ public class UserService implements UserDetailsService {
           userRegisterRequest.setUserRole(UserRole.USER);
       }
 
-        User userEntity = UserMapper.toUserEntity(userRegisterRequest);
+        User user = UserMapper.toUserEntity(userRegisterRequest);
 
-        userEntity = userRepository.save(userEntity);
+        Budget budget =  budgetService.createDefaultBudget(user);
 
-        Budget defaultBudget =  budgetService.createDefaultBudget(userEntity);
-        userEntity.getBudgets().add(defaultBudget);
+        user.addBudget(budget);
 
-        userEntity.setSavingGoals(new ArrayList<>());
-
-        userEntity.setTransactions(new ArrayList<>());
-
+        userRepository.save(user);
         log.info("Registering new user with username: {}", userRegisterRequest.getUsername());
 
-        return UserMapper.toUserDto(userEntity);
+        return UserMapper.toUserDto(user);
     }
 
     public UserDto getById(UUID id) {
@@ -149,5 +141,20 @@ public class UserService implements UserDetailsService {
                 .password(user.getPassword())
                 .role(user.getUserRole())
                 .build();
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserDto updateRole(UUID id, @Valid UpdateUserRoleDto updateUserRoleDto) {
+
+        User user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException(id));
+        
+        user.setUserRole(updateUserRoleDto.getRole());
+        
+        userRepository.save(user);
+
+        log.info("User role for username: {} changed", user.getUsername());
+        
+        return UserMapper.toUserDto(user);
     }
 }
