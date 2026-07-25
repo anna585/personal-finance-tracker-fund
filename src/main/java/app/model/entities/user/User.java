@@ -44,4 +44,9 @@ public class User {
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private List<SavingGoal> savingGoals = new ArrayList<>();
+
+    public void addBudget(Budget budget) {
+        budgets.add(budget);
+        budget.setUser(this);
+    }
 }
