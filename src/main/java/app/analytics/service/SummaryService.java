@@ -25,8 +25,6 @@ public class SummaryService {
 
     public SummaryResponse generateSummary(UUID userId) {
 
-        log.info("Calculating monthly summary for user {}", userId);
-
         YearMonth month = YearMonth.now();
 
         LocalDateTime start = month.atDay(1).atStartOfDay();

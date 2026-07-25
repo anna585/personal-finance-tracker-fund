@@ -74,7 +74,8 @@ public class SavingController {
 
         savingService.createGoal(user.getId(), savingRequest);
 
-        return new ModelAndView("redirect:/savings");
+        return new ModelAndView("redirect:/savings?success)")
+                .addObject("savingRequest", savingRequest);
     }
 
     @PostMapping("/{id}/delete")

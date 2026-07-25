@@ -3,7 +3,6 @@ package app.services.saving;
 import app.exeption.user.InvalidUuidException;
 import app.exeption.budget.BudgetNotEnoughException;
 import app.exeption.budget.BudgetNotFoundException;
-import app.exeption.budget.MonthlyBudgetExceededException;
 import app.exeption.savings.SavingGoalNotFoundException;
 import app.exeption.user.*;
 import app.mapper.saving.SavingGoalsMapper;
@@ -80,7 +79,7 @@ public class SavingService {
                         new UserNotFoundException(userId));
 
         Budget budget = budgetRepository.findByUserAndMonthAndYear(user, now.getMonth(), now.getYear())
-                .orElseThrow(() ->
+                .orElseThrow(()->
                         new BudgetNotFoundException(userId));
 
         BigDecimal spent = transactionService.getTotalSpentByUser(userId);
@@ -89,10 +88,8 @@ public class SavingService {
         BigDecimal autoSave = remaining.multiply(BigDecimal.valueOf(0.10));
         BigDecimal currentAmountAndAutoSave = savingRequest.getCurrentAmount().add(autoSave);
 
-        if(remaining.compareTo(autoSave) < 0){
+       if (remaining.compareTo(currentAmountAndAutoSave) < 0) {
             throw new BudgetNotEnoughException();
-        } else if (remaining.compareTo(currentAmountAndAutoSave) < 0) {
-            throw new MonthlyBudgetExceededException();
         }
 
         Transaction transaction = Transaction.builder()
@@ -119,7 +116,7 @@ public class SavingService {
         user.getSavingGoals().add(savingGoal);
         userRepository.save(user);
 
-        log.info("Creating saving goal with id {}", savingGoal.getId());
+        log.info("Creating saving goal with id {} and target amount {} EURO.", savingGoal.getId(), savingGoal.getTargetAmount());
 
         return UserMapper.toUserDto(user);
 
