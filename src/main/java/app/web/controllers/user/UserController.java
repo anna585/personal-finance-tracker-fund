@@ -107,4 +107,43 @@ public class  UserController {
                 .addObject("userProfileDto", userProfileDto);
 
     }
+
+    @GetMapping("/admin/users/{id}/update-role")
+    public ModelAndView menageRole(@PathVariable UUID id){
+
+        UserDto user = userService.getById(id);
+
+        UpdateUserRoleDto updateUserRoleDto = UpdateUserRoleDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .role(user.getUserRole())
+                .build();
+
+        return new ModelAndView("update-role")
+                .addObject("updateUserRoleDto", updateUserRoleDto)
+                .addObject("user", user);
+    }
+
+    @PostMapping("/admin/users/{id}/update-role")
+    public ModelAndView updateUserRole(@Valid @ModelAttribute UpdateUserRoleDto updateUserRoleDto,
+                                       BindingResult bindingResult){
+
+        UserDto user = userService.updateRole(updateUserRoleDto.getId(), updateUserRoleDto);
+
+        if(bindingResult.hasErrors()){
+
+            return new ModelAndView("update-role")
+                    .addObject("updateUserRoleDto", updateUserRoleDto)
+                    .addObject("user", user);
+        }
+
+        return new ModelAndView("redirect:/admin/users/{id}/update-role?success")
+                .addObject("updateUserRoleDto", updateUserRoleDto)
+                .addObject("user", user)
+                .addObject("id", updateUserRoleDto.getId());
+    }
+
 }
