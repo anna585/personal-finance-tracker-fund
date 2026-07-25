@@ -91,7 +91,7 @@ body {
 }
 
 
-.profile-info input {
+.profile-info input,  .profile-info select{
     width: 100%;
     padding: 12px;
 
