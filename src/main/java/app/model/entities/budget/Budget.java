@@ -22,8 +22,9 @@ public class Budget {
     private UUID id;
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal monthlyLimit;
-    @Column(nullable = false)
+    @Column(name = "budget_month", nullable = false)
     private Month month;
+    @Column(name = "budget_year")
     private int year;
     @ManyToOne
     @JoinColumn(name = "user_id")
