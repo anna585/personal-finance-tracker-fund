@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Profile | FinanceTracker</title>
+    <link rel="stylesheet" href="/css/profile.css">
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <h2 class="logo">FinanceTracker</h2>
+
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/transactions">Transactions</a>
+            <a href="/budget">Budget</a>
+            <a href="/savings">Savings</a>
+            <a href="/report-history">Report History</a>
+            <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <a href="/admin/users">Users</a>
+                <span> | </span>
+                <a href="/admin/statistics">Statistics</a>
+            </div>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+</header>
+
+<div class="profile-container">
+
+    <div class="profile-card">
+
+        <h2 class="profile-title">
+            Customer Profile
+        </h2>
+        <p class="success-message" th:if="${param.success}"> Profile information updated successfully.</p>
+
+
+        <form th:action="@{/admin/users/{id}/update-role(id=${user.id})}"
+              th:object="${updateUserRoleDto}"
+              th:method="post" onsubmit="return confirm('Are you sure that you want to change the profile information?')">
+
+
+            <div class="profile-info">
+                <label>Username</label>
+                <input th:field="*{username}" readonly>
+            </div>
+
+            <div class="profile-info">
+                <label>First Name</label>
+                <input th:field="*{firstName}" readonly>
+            </div>
+
+            <div class="profile-info">
+                <label>Last Name</label>
+                <input th:field="*{lastName}" readonly>
+            </div>
+
+            <div class="profile-info">
+                <label>Email</label>
+                <input th:field="*{email}" readonly>
+            </div>
+
+            <div class="profile-info">
+                <label>Role</label>
+
+                <select th:field="*{role}">
+                    <option value="">Select role</option>
+                    <option th:each="role : ${T(app.model.entities.user.UserRole).values()}"
+                            th:value="${role}"
+                            th:text="${role}">
+
+                    </option>
+                </select>
+            </div>
+
+            <button class="profile-button" type="submit">
+                Save changes
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
