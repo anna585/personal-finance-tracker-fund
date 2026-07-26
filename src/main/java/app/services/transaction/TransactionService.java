@@ -5,10 +5,8 @@ import app.exeption.budget.BudgetNotFoundException;
 import app.exeption.transaction.TransactionNotFoundException;
 import app.exeption.user.UserNotFoundException;
 import app.mapper.transaction.TransactionMapper;
-import app.mapper.user.UserMapper;
 import app.web.dto.transaction.TransactionDto;
 import app.web.dto.transaction.TransactionRequest;
-import app.web.dto.user.UserDto;
 import app.model.entities.budget.Budget;
 import app.model.entities.transaction.Transaction;
 import app.model.entities.transaction.TransactionType;
@@ -39,7 +37,7 @@ public class TransactionService {
     private final SavingRepository savingRepository;
 
     @Transactional
-    public UserDto createNewTransaction(UUID id, TransactionRequest transactionRequest) {
+    public TransactionDto createNewTransaction(UUID id, TransactionRequest transactionRequest) {
         LocalDateTime createAt = LocalDateTime.now();
 
         User user = userRepository.findById(id)
@@ -48,8 +46,10 @@ public class TransactionService {
         Budget budget = budgetRepository.findByUserAndMonthAndYear(user, createAt.getMonth(), createAt.getYear())
                 .orElseThrow(() -> new BudgetNotFoundException(id));
 
+        BigDecimal totalSpentForMonth = transactionRepository.getTotalSpentByUser(user.getId());
 
-        if(budget.getMonthlyLimit().compareTo(transactionRequest.getAmount()) < 0 && transactionRequest.getType().equals(TransactionType.EXPENSE)){
+        if(totalSpentForMonth.add(transactionRequest.getAmount()).compareTo(budget.getMonthlyLimit()) > 0
+                && transactionRequest.getType().equals(TransactionType.EXPENSE)){
             throw new BudgetNotEnoughException();
         }
 
@@ -63,9 +63,9 @@ public class TransactionService {
 
         transactionRepository.save(transaction);
 
-        log.info("Creating transaction for user {}", user.getId());
+        log.info("Creating transaction for user with ID: {}", user.getId());
 
-        return UserMapper.toUserDto(user);
+        return TransactionMapper.toDto(transaction);
     }
 
     public BigDecimal getTotalSpentByUser(UUID id) {
