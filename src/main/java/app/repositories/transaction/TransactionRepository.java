@@ -19,16 +19,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
         WHERE t.user.id = :userId
         AND t.type = 'EXPENSE'
         """)
-    BigDecimal getTotalSpentByUser(UUID userId);
-
-
-    @Query("""
-        SELECT COALESCE(SUM(t.amount), 0)
-        FROM Transaction t
-        WHERE t.user.id = :userId
-        AND t.type = 'INCOME'
-        """)
-    BigDecimal getTotalIncomeByUser(UUID userId);
+    BigDecimal findTotalSpentByUser(UUID userId);
 
     List<Transaction> findAllByUserIdOrderByCreatedAtDesc(UUID id);
 
