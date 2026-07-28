@@ -5,7 +5,7 @@ import app.analytics.dto.ReportResponse;
 import app.analytics.dto.StatisticResponse;
 import app.analytics.dto.SummaryResponse;
 import app.web.dto.transaction.TransactionDto;
-import app.web.dto.user.UserDto;
+import app.web.dto.user.UsersDetails;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,5 +38,5 @@ public interface TransactionClient {
 
     @PostMapping("/api/v1/analytics/statistic")
     StatisticResponse postStatisticForAllUsers(
-            @RequestBody List<UserDto> userList);
+            @RequestBody UsersDetails usersDetails);
 }
