@@ -46,7 +46,7 @@ public class TransactionService {
         Budget budget = budgetRepository.findByUserAndMonthAndYear(user, createAt.getMonth(), createAt.getYear())
                 .orElseThrow(() -> new BudgetNotFoundException(id));
 
-        BigDecimal totalSpentForMonth = transactionRepository.getTotalSpentByUser(user.getId());
+        BigDecimal totalSpentForMonth = transactionRepository.findTotalSpentByUser(user.getId());
 
         if(totalSpentForMonth.add(transactionRequest.getAmount()).compareTo(budget.getMonthlyLimit()) > 0
                 && transactionRequest.getType().equals(TransactionType.EXPENSE)){
@@ -68,10 +68,10 @@ public class TransactionService {
         return TransactionMapper.toDto(transaction);
     }
 
-    public BigDecimal getTotalSpentByUser(UUID id) {
+    public BigDecimal getTotalSpentByUser(User user) {
 
-       return transactionRepository.getTotalSpentByUser(id) != null
-               ? transactionRepository.getTotalSpentByUser(id)
+       return transactionRepository.findTotalSpentByUser(user.getId()) != null
+               ? transactionRepository.findTotalSpentByUser(user.getId())
                : BigDecimal.ZERO;
     }
 
@@ -98,6 +98,7 @@ public class TransactionService {
 
         List<Transaction> transaction = transactionRepository
                 .findByUserIdAndCreatedAtBetween(id, start, end);
+
         return transaction
                 .stream()
                 .map(TransactionMapper::toDto)
@@ -141,4 +142,8 @@ public class TransactionService {
     }
 
 
+    public List<Transaction> getAllTransactions() {
+
+        return transactionRepository.findAll();
+    }
 }
