@@ -24,17 +24,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.Month;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TransactionServiceUTest {
@@ -61,6 +58,8 @@ public class TransactionServiceUTest {
     @Test
     public void whenBudgetIsEnough_thenTransactionIsSuccessRecord(){
 
+        LocalDateTime dateTime = LocalDateTime.now();
+
         User user = User.builder()
                 .id(UUID.randomUUID())
                 .build();
@@ -73,13 +72,13 @@ public class TransactionServiceUTest {
 
         Budget budget = Budget.builder()
                 .monthlyLimit(BigDecimal.valueOf(1000.00))
-                .month(Month.JULY)
-                .year(2026)
+                .month(dateTime.getMonth())
+                .year(dateTime.getYear())
                 .build();
 
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        when(budgetRepository.findByUserAndMonthAndYear(user, Month.JULY, 2026)).thenReturn(Optional.of(budget));
+        when(budgetRepository.findByUserAndMonthAndYear(user, dateTime.getMonth(), dateTime.getYear())).thenReturn(Optional.of(budget));
         when(transactionRepository.findTotalSpentByUser(user.getId())).thenReturn(BigDecimal.ZERO);
 
         transactionService.createNewTransaction(user.getId(), transactionRequest);
@@ -98,6 +97,7 @@ public class TransactionServiceUTest {
 
     @Test
     public void createTransaction_whenBudgetIsNotEnoughAndTransactionTypeIsExpense_thenThrowBudgetNotEnoughException(){
+        LocalDateTime dateTime = LocalDateTime.now();
 
         User user = User.builder()
                 .id(UUID.randomUUID())
@@ -111,13 +111,13 @@ public class TransactionServiceUTest {
 
         Budget budget = Budget.builder()
                 .monthlyLimit(BigDecimal.valueOf(200.00))
-                .month(Month.JULY)
-                .year(2026)
+                .month(dateTime.getMonth())
+                .year(dateTime.getYear())
                 .build();
 
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        when(budgetRepository.findByUserAndMonthAndYear(user, Month.JULY, 2026)).thenReturn(Optional.of(budget));
+        when(budgetRepository.findByUserAndMonthAndYear(user, dateTime.getMonth(), dateTime.getYear())).thenReturn(Optional.of(budget));
         when(transactionRepository.findTotalSpentByUser(user.getId())).thenReturn(BigDecimal.ZERO);
 
         assertThrows(BudgetNotEnoughException.class, () -> transactionService.createNewTransaction(user.getId(), transactionRequest));
@@ -127,6 +127,7 @@ public class TransactionServiceUTest {
 
     @Test
     public void createTransaction_whenBudgetIsNotEnoughAndTransactionTypeIsIncome_thenTransactionInSuccessRecord(){
+        LocalDateTime dateTime = LocalDateTime.now();
 
         User user = User.builder()
                 .id(UUID.randomUUID())
@@ -140,13 +141,13 @@ public class TransactionServiceUTest {
 
         Budget budget = Budget.builder()
                 .monthlyLimit(BigDecimal.valueOf(200.00))
-                .month(Month.JULY)
-                .year(2026)
+                .month(dateTime.getMonth())
+                .year(dateTime.getYear())
                 .build();
 
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        when(budgetRepository.findByUserAndMonthAndYear(user, Month.JULY, 2026)).thenReturn(Optional.of(budget));
+        when(budgetRepository.findByUserAndMonthAndYear(user, dateTime.getMonth(), dateTime.getYear())).thenReturn(Optional.of(budget));
         when(transactionRepository.findTotalSpentByUser(user.getId())).thenReturn(BigDecimal.ZERO);
 
         transactionService.createNewTransaction(user.getId(), transactionRequest);
@@ -168,6 +169,7 @@ public class TransactionServiceUTest {
         when(transactionRepository.findById(any())).thenReturn(Optional.empty());
 
         assertThrows(TransactionNotFoundException.class, ()-> transactionService.deleteTransaction(any()));
+        verify(transactionRepository).findById(any());
     }
 
     @Test
@@ -195,6 +197,7 @@ public class TransactionServiceUTest {
         when(transactionRepository.findTotalSpentByUser(user.getId())).thenReturn(null);
 
         assertEquals(BigDecimal.ZERO, transactionService.getTotalSpentByUser(user));
+        verify(transactionRepository).findTotalSpentByUser(user.getId());
     }
 
     @Test
@@ -226,6 +229,7 @@ public class TransactionServiceUTest {
 
         when(transactionRepository.findById(any())).thenReturn(Optional.empty());
         assertThrows(TransactionNotFoundException.class , () -> transactionService.updateTransaction(userId, request));
+        verify(transactionRepository).findById(any());
 
     }
 
@@ -263,6 +267,7 @@ public class TransactionServiceUTest {
         when(transactionRepository.findById(any())).thenReturn(Optional.empty());
 
         assertThrows(TransactionNotFoundException.class, ()->  transactionService.getTransactionById(any()));
+        verify(transactionRepository).findById(any());
 
     }
 
@@ -278,6 +283,96 @@ public class TransactionServiceUTest {
         TransactionDto dto = transactionService.getTransactionById(any());
 
         assertEquals(transaction.getId(), dto.getId());
+        verify(transactionRepository).findById(any());
 
+    }
+
+    @Test
+    public void getAllTransactionByUserId_thenReturnListOfAllTransactionByUserId(){
+        UUID userId = UUID.randomUUID();
+        Transaction transaction = Transaction.builder()
+                .amount(BigDecimal.valueOf(5.00))
+                .build();
+
+        List<Transaction> transactions = List.of(transaction, transaction, transaction, transaction);
+
+        when(transactionRepository.findAllByUserIdOrderByCreatedAtDesc(userId)).thenReturn(transactions);
+
+        List<Transaction> list = transactionService.getAllTransactionsByUser(userId);
+
+        assertEquals(transactions.size(), list.size());
+        verify(transactionRepository).findAllByUserIdOrderByCreatedAtDesc(userId);
+
+    }
+
+    @Test
+    public void getTransactionsForReportByUserId_thenReturnListOfTransactionDtoFindByIdUserAndCreateBetweenStartAndEndDate(){
+        UUID userId = UUID.randomUUID();
+        Transaction transaction = Transaction.builder()
+                .amount(BigDecimal.valueOf(5.00))
+                .createdAt(LocalDateTime.of(2026, 1, 15, 10, 30))
+                .build();
+
+        LocalDateTime startDate = LocalDateTime.of(2026, 1, 1, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2026, 1, 31, 23, 59);
+
+        List<Transaction> transactions = List.of(transaction, transaction, transaction, transaction);
+
+        when(transactionRepository.findByUserIdAndCreatedAtBetween(userId, startDate, endDate)).thenReturn(transactions);
+
+        List<TransactionDto> list = transactionService.getTransactionForReport(userId, startDate, endDate);
+
+        assertEquals(4, list.size());
+
+        verify(transactionRepository, times(1))
+                .findByUserIdAndCreatedAtBetween(
+                        userId,
+                        startDate,
+                        endDate
+                );
+
+    }
+
+    @Test
+    public void getAllTransactions_thenListOfAllTransactions(){
+
+        Transaction transaction1 = Transaction.builder()
+                .amount(BigDecimal.valueOf(5.00))
+                .build();
+
+        List<Transaction> transactions1 = List.of(transaction1, transaction1, transaction1, transaction1);
+        List<Transaction> transactions2 = List.of(transaction1, transaction1, transaction1, transaction1);
+
+        List<Transaction> allTransactions = new ArrayList<>();
+        allTransactions.addAll(transactions1);
+        allTransactions.addAll(transactions2);
+
+        when(transactionRepository.findAll()).thenReturn(allTransactions);
+
+        assertEquals(allTransactions.size(), transactionService.getAllTransactions().size());
+        verify(transactionRepository).findAll();
+    }
+
+    @Test
+    public void getTop5Transactions_thenReturnListWith5TransactionsByUserIdOrderByCreatedAtDesc(){
+        UUID userId = UUID.randomUUID();
+        Transaction transaction = Transaction.builder()
+                .amount(BigDecimal.valueOf(20.00))
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        List<Transaction> list = IntStream.range(0, 5)
+                .mapToObj(i -> Transaction.builder()
+                        .amount(BigDecimal.valueOf(20 + i))
+                        .createdAt(LocalDateTime.now().minusDays(i))
+                        .build())
+                .toList();
+
+        when(transactionRepository.findTop5ByUserIdOrderByCreatedAtDesc(userId)).thenReturn(list);
+
+        List<TransactionDto> transactionDtos = transactionService.getTop5Transactions(userId);
+
+        assertEquals(5, transactionDtos.size());
+        verify(transactionRepository).findTop5ByUserIdOrderByCreatedAtDesc(userId);
     }
 }
