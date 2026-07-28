@@ -28,8 +28,8 @@ public class UserInit implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        List<UserDto> users = userService.getAllUsers();
-        if (!users.isEmpty()) {
+
+        if (userService.existsByUsername("AnnaPetrova")) {
             return;
         }
 
