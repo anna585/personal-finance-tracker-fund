@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.math.BigDecimal;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/budget")
@@ -30,22 +28,18 @@ public class BudgetController {
     private final BudgetService budgetService;
     private final TransactionService transactionService;
 
-     private ModelAndView populateBudgetPage(ModelAndView modelAndView,
-                                             MonthlyBudgetRequest monthlyBudgetRequest,
-                                             User user,
-                                             UUID userId){
+     private ModelAndView createBudgetView(ModelAndView modelAndView,
+                                             MonthlyBudgetRequest request,
+                                             User user){
 
         BudgetDto budget = budgetService.getCurrentBudget(user);
 
-        BigDecimal spent = transactionService.getTotalSpentByUser(userId);
-        BigDecimal remaining = budgetService.calculateRemainingBudget(user);
-
         return modelAndView
-                .addObject("monthlyBudgetRequest", monthlyBudgetRequest)
+                .addObject("monthlyBudgetRequest", request)
                 .addObject("budget", budget)
                 .addObject("user", user)
-                .addObject("spent", spent)
-                .addObject("remaining", remaining);
+                .addObject("spent", transactionService.getTotalSpentByUser(user))
+                .addObject("remaining", budgetService.calculateRemainingBudget(user));
 
     }
 
@@ -54,10 +48,9 @@ public class BudgetController {
 
         User user = userService.getEntityById(principal.getId());
 
-       return populateBudgetPage(new ModelAndView("budget"),
+       return createBudgetView(new ModelAndView("budget"),
                MonthlyBudgetRequest.builder().build(),
-               user,
-               user.getId());
+               user);
     }
 
     @PostMapping
@@ -69,10 +62,9 @@ public class BudgetController {
 
         if(bindingResult.hasErrors()){
 
-            return populateBudgetPage(new ModelAndView("budget"),
+            return createBudgetView(new ModelAndView("budget"),
                     monthlyBudgetRequest,
-                    user,
-                    user.getId());
+                    user);
         }
 
         budgetService.updateMonthlyBudget(user,monthlyBudgetRequest);
