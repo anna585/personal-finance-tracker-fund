@@ -3,12 +3,14 @@ package app.analytics.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 public class SummaryResponse {
 
-    private long monthlyIncome;
-    private long monthlyExpense;
-    private long monthlyBalance;
-    private long monthlySavingRade;
+    private BigDecimal monthlyIncome;
+    private BigDecimal monthlyExpense;
+    private BigDecimal monthlyBalance;
+    private BigDecimal monthlySavingRade;
 }
