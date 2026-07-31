@@ -1,7 +1,15 @@
 package app.services.user;
 
 import app.exeption.user.*;
+import app.mapper.budget.BudgetMapper;
+import app.mapper.saving.SavingGoalsMapper;
+import app.mapper.transaction.TransactionMapper;
 import app.mapper.user.UserMapper;
+import app.services.saving.SavingService;
+import app.services.transaction.TransactionService;
+import app.web.dto.budget.BudgetDto;
+import app.web.dto.saving.SavingGoalsDto;
+import app.web.dto.transaction.TransactionDto;
 import app.web.dto.user.*;
 import app.model.entities.budget.Budget;
 import app.model.entities.user.User;
@@ -30,6 +38,8 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final BudgetService budgetService;
+    private final TransactionService transactionService;
+    private final SavingService savingService;
 
     @Transactional
     public UserDto register(UserRegisterRequest userRegisterRequest){
@@ -76,7 +86,7 @@ public class UserService implements UserDetailsService {
                         new UserNotFoundException(id));
     }
 
-    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserDto> getAllUsers() {
 
         return userRepository.findAll()
@@ -156,5 +166,26 @@ public class UserService implements UserDetailsService {
         log.info("User role for username: {} changed", user.getUsername());
         
         return UserMapper.toUserDto(user);
+    }
+
+    public boolean existsByUsername(String username) {
+
+        return userRepository.existsByUsername(username);
+    }
+
+    public UsersDetailLists getAllUsersDetails() {
+
+        List<UserDto> users = userRepository.findAll().stream().map(UserMapper::toUserDto).toList();
+        List<BudgetDto> budgets = budgetService.getAllBudgets().stream().map(BudgetMapper::toDto).toList();
+        List<TransactionDto> transactions = transactionService.getAllTransactions().stream().map(TransactionMapper::toDto).toList();
+        List<SavingGoalsDto> savingGoals = savingService.getAllSavingGoals().stream().map(SavingGoalsMapper::toDto).toList();
+
+        return UsersDetailLists.builder()
+                .users(users)
+                .budgets(budgets)
+                .transactions(transactions)
+                .saving(savingGoals)
+                .build();
+
     }
 }
