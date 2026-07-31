@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.Month;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,5 +21,5 @@ public interface BudgetRepository extends JpaRepository<Budget, UUID> {
     WHERE b.user = :user
     ORDER BY b.year DESC, b.month DESC
 """)
-    List<Budget> findLatestBudget(User user);
+    Optional<Budget> findLatestBudget(User user);
 }
