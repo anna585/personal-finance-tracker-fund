@@ -4,6 +4,7 @@ import app.web.dto.user.*;
 import app.services.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -56,6 +57,7 @@ public class  UserController {
             return new ModelAndView("redirect:/login");
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/users")
     public ModelAndView getUsers(){
 
@@ -63,7 +65,7 @@ public class  UserController {
                 .addObject("users", userService.getAllUsers());
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/users/{id}/delete")
     public ModelAndView deleteUser(@PathVariable UUID id){
 
@@ -94,13 +96,15 @@ public class  UserController {
                                       BindingResult bindingResult,
                                       @AuthenticationPrincipal AuthenticationUserDetails principal){
 
-        UserDto user = userService.updateProfileInformation(principal.getId(), userProfileDto);
 
         if(bindingResult.hasErrors()){
+            UserDto user = userService.getById(principal.getId());
             return new ModelAndView("profile")
                     .addObject("userProfileDto", userProfileDto)
                     .addObject("user", user);
         }
+
+        UserDto user = userService.updateProfileInformation(principal.getId(), userProfileDto);
 
         return new ModelAndView("redirect:/profile?success")
                 .addObject("user", user)
@@ -108,6 +112,7 @@ public class  UserController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/users/{id}/update-role")
     public ModelAndView menageRole(@PathVariable UUID id){
 
@@ -127,18 +132,19 @@ public class  UserController {
                 .addObject("user", user);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/users/{id}/update-role")
     public ModelAndView updateUserRole(@Valid @ModelAttribute UpdateUserRoleDto updateUserRoleDto,
                                        BindingResult bindingResult){
 
-        UserDto user = userService.updateRole(updateUserRoleDto.getId(), updateUserRoleDto);
 
         if(bindingResult.hasErrors()){
 
             return new ModelAndView("update-role")
-                    .addObject("updateUserRoleDto", updateUserRoleDto)
-                    .addObject("user", user);
+                    .addObject("updateUserRoleDto", updateUserRoleDto);
         }
+
+        UserDto user = userService.updateRole(updateUserRoleDto.getId(), updateUserRoleDto);
 
         return new ModelAndView("redirect:/admin/users/{id}/update-role?success")
                 .addObject("updateUserRoleDto", updateUserRoleDto)
