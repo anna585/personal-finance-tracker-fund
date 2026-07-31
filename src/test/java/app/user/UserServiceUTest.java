@@ -46,6 +46,9 @@ public class UserServiceUTest {
     @Mock
     private SavingService savingService;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     UserService userService;
 
