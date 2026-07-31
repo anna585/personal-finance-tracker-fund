@@ -12,8 +12,6 @@ import java.math.BigDecimal;
 public class MonthlyBudgetRequest {
 
     @NotNull(message = "Amount is required")
-    @DecimalMin(value = "0.0", message = "Budget cannot be negative.")
+    @DecimalMin(value = "0.01", message = "Budget cannot be negative.")
     private BigDecimal monthlyBudget;
-    private BigDecimal spent;
-    private BigDecimal remaining;
 }
