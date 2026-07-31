@@ -10,9 +10,9 @@ import java.math.BigDecimal;
 @Builder
 public class StatisticResponse {
 
-    private BigDecimal totalUsers;
-    private BigDecimal totalTransactions;
-    private BigDecimal totalBudget;
-    private BigDecimal totalSavings;
+    private long totalUsers;
+    private long totalTransactions;
+    private long totalBudget;
+    private long totalSavings;
 
 }
