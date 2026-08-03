@@ -7,6 +7,7 @@ import app.web.dto.transaction.TransactionDto;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class SummaryService {
     private final TransactionClient client;
     private final TransactionService transactionService;
 
+    @Cacheable(value = "summary", key = "#userId")
     public SummaryResponse generateSummary(UUID userId) {
 
         YearMonth month = YearMonth.now();
@@ -44,8 +46,6 @@ public class SummaryService {
 
             return null;
         }
-
-
 
     }
 }

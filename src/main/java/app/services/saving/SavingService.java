@@ -26,6 +26,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 
@@ -54,6 +55,7 @@ public class SavingService {
         return SavingGoalsMapper.toDto(savingGoal);
     }
 
+    @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
     public void deleteSavingGoal(UUID id) {
 
@@ -65,8 +67,9 @@ public class SavingService {
         log.info("Delete saving goal with id {}", id);
     }
 
+    @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
-    public UserDto createGoal(UUID userId, @Valid SavingRequest savingRequest) {
+    public SavingGoalsDto createGoal(UUID userId, @Valid SavingRequest savingRequest) {
 
         if(savingRequest.getTargetDate().isBefore(LocalDate.now())){
             throw new TargetDateInPastException();
@@ -82,7 +85,7 @@ public class SavingService {
                 .orElseThrow(()->
                         new BudgetNotFoundException(userId));
 
-        BigDecimal spent = transactionService.getTotalSpentByUser(userId);
+        BigDecimal spent = transactionService.getTotalSpentByUser(user);
         BigDecimal remaining =budget.getMonthlyLimit().subtract(spent);
 
         BigDecimal autoSave = remaining.multiply(BigDecimal.valueOf(0.10));
@@ -118,7 +121,7 @@ public class SavingService {
 
         log.info("Creating saving goal with id {} and target amount {} EURO.", savingGoal.getId(), savingGoal.getTargetAmount());
 
-        return UserMapper.toUserDto(user);
+        return SavingGoalsMapper.toDto(savingGoal);
 
     }
 
@@ -151,5 +154,10 @@ public class SavingService {
         log.info("Updating saving goal with name {}", editSavingRequest.getGoalName());
 
         return SavingGoalsMapper.toDto(savingEntity);
+    }
+
+    public List<SavingGoal> getAllSavingGoals() {
+
+        return savingRepository.findAll();
     }
 }

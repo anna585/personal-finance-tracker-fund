@@ -7,6 +7,8 @@ import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,24 +22,19 @@ public class ReportService {
 
     private final TransactionClient client;
 
+    @Cacheable("report")
     @Transactional
     public ReportResponse generateReport(ReportRequest reportRequest) {
 
         log.info("Generating report for user {}", reportRequest.getUserId());
 
-        ReportRequest dto = ReportRequest.builder()
-                .userId(reportRequest.getUserId())
-                .start(reportRequest.getStart())
-                .end(reportRequest.getEnd())
-                .transactions(reportRequest.getTransactions())
-                .build();
-
         try {
-
-           return client.generateReport(dto);
-
+            return client.generateReport(reportRequest);
         } catch (FeignException e) {
-            log.error("Analytics service returned {}", e.status(), e);
+            log.error("Failed to generate report for user {}. Analytics service returned {}",
+                    reportRequest.getUserId(),
+                    e.status(),
+                    e);
             throw e;
         }
 
@@ -48,6 +45,8 @@ public class ReportService {
         return client.getHistory(String.valueOf(userId)).getBody();
     }
 
+    @CacheEvict("report")
+    @Transactional
     public void deleteReport(UUID reportId) {
 
         client.deleteReport(reportId);

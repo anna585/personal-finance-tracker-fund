@@ -3,12 +3,12 @@ package app.analytics.service;
 import app.analytics.client.TransactionClient;
 import app.analytics.dto.StatisticResponse;
 import app.services.user.UserService;
-import app.web.dto.user.UserDto;
+import app.web.dto.user.UsersDetailLists;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,12 +17,12 @@ public class StatisticService {
     private final UserService userService;
     private final TransactionClient client;
 
-
+    @Cacheable(value = "statistic")
     @PreAuthorize("hasRole('ADMIN')")
     public StatisticResponse getAllUsersForStatistic() {
 
-        List<UserDto> userList = userService.getAllUsers();
+        UsersDetailLists usersDetailLists = userService.getAllUsersDetails();
 
-        return  client.postStatisticForAllUsers(userList);
+        return  client.postStatisticForAllUsers(usersDetailLists);
     }
 }

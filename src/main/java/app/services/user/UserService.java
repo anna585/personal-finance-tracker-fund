@@ -20,6 +20,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -41,6 +42,7 @@ public class UserService implements UserDetailsService {
     private final TransactionService transactionService;
     private final SavingService savingService;
 
+    @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
     public UserDto register(UserRegisterRequest userRegisterRequest){
 
@@ -96,6 +98,7 @@ public class UserService implements UserDetailsService {
 
     }
 
+    @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(UUID id) {

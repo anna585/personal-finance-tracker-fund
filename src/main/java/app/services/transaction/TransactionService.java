@@ -19,10 +19,14 @@ import app.repositories.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,9 +40,18 @@ public class TransactionService {
     private final UserRepository userRepository;
     private final SavingRepository savingRepository;
 
+    @Caching(evict = {
+            @CacheEvict(value = "summary", key = "#id"),
+            @CacheEvict(value = "statistic", allEntries = true)
+    })
     @Transactional
     public TransactionDto createNewTransaction(UUID id, TransactionRequest transactionRequest) {
         LocalDateTime createAt = LocalDateTime.now();
+
+        YearMonth currentMonth = YearMonth.now();
+
+        LocalDateTime start = currentMonth.atDay(1).atStartOfDay();
+        LocalDateTime end = currentMonth.atEndOfMonth().atTime(LocalTime.MAX);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
@@ -46,7 +59,7 @@ public class TransactionService {
         Budget budget = budgetRepository.findByUserAndMonthAndYear(user, createAt.getMonth(), createAt.getYear())
                 .orElseThrow(() -> new BudgetNotFoundException(id));
 
-        BigDecimal totalSpentForMonth = transactionRepository.findTotalSpentByUser(user.getId());
+        BigDecimal totalSpentForMonth = transactionRepository.findTotalSpentByUser(user.getId(), start, end);
 
         if(totalSpentForMonth.add(transactionRequest.getAmount()).compareTo(budget.getMonthlyLimit()) > 0
                 && transactionRequest.getType().equals(TransactionType.EXPENSE)){
@@ -70,11 +83,22 @@ public class TransactionService {
 
     public BigDecimal getTotalSpentByUser(User user) {
 
-       return transactionRepository.findTotalSpentByUser(user.getId()) != null
-               ? transactionRepository.findTotalSpentByUser(user.getId())
-               : BigDecimal.ZERO;
+        YearMonth currentMonth = YearMonth.now();
+
+        LocalDateTime start = currentMonth.atDay(1).atStartOfDay();
+        LocalDateTime end = currentMonth.atEndOfMonth().atTime(LocalTime.MAX);
+
+        return transactionRepository
+                .findTotalSpentByUser(
+                        user.getId(),
+                        start,
+                        end);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "summary", key = "#id"),
+            @CacheEvict(value = "statistic", allEntries = true)
+    })
     @Transactional
     public void deleteTransaction(UUID id) {
 
@@ -113,6 +137,7 @@ public class TransactionService {
         return TransactionMapper.toDto(transaction);
     }
 
+    @CacheEvict(value = "summary", key = "#id")
     @Transactional
     public TransactionDto updateTransaction(UUID id, TransactionRequest transactionRequest) {
 
