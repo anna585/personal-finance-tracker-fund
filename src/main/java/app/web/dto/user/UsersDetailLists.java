@@ -10,7 +10,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class UsersDetails {
+public class UsersDetailLists {
 
     private List<UserDto> users;
     private List<TransactionDto> transactions;
