@@ -1,7 +1,6 @@
 package app.services.user;
 
 
-import app.web.dto.user.UserDto;
 import app.web.dto.user.UserRegisterRequest;
 import app.model.entities.user.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 
 @Slf4j
 @Component

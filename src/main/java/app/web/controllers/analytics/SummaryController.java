@@ -55,7 +55,6 @@ public class SummaryController {
             modelAndView.addObject("analyticsAvailable", false);
             modelAndView.addObject(    "analyticsMessage",
                    "🟡 Analytics service is temporarily unavailable.");
-            System.out.println(modelAndView);
         }else {
             modelAndView.addObject("analyticsAvailable", true);
         }

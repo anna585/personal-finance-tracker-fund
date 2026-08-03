@@ -1,18 +1,11 @@
 package app.mapper.user;
 
-import app.mapper.budget.BudgetMapper;
-import app.mapper.saving.SavingGoalsMapper;
-import app.mapper.transaction.TransactionMapper;
-import app.web.dto.budget.BudgetDto;
-import app.web.dto.saving.SavingGoalsDto;
-import app.web.dto.transaction.TransactionDto;
 import app.web.dto.user.UserDto;
 import app.web.dto.user.UserRegisterRequest;
 import app.model.entities.user.User;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @NoArgsConstructor
 public class UserMapper {
@@ -41,21 +34,6 @@ public class UserMapper {
             return null;
         }
 
-        List<TransactionDto> transactionDtoList = user.getTransactions()
-                .stream()
-                .map(TransactionMapper::toDto)
-                .toList();
-
-        List<BudgetDto> budgetDtoList = user.getBudgets()
-                .stream()
-                .map(BudgetMapper::toDto)
-                .toList();
-
-        List<SavingGoalsDto> savingGoalsDtoList = user.getSavingGoals()
-                .stream()
-                .map(SavingGoalsMapper::toDto)
-                .toList();
-
         return UserDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
@@ -65,9 +43,6 @@ public class UserMapper {
                 .userRole(user.getUserRole())
                 .createdOn(user.getCreatedOn())
                 .updatedOn(user.getUpdatedOn())
-                .transactions(transactionDtoList)
-                .budgets(budgetDtoList)
-                .saving(savingGoalsDtoList)
                 .build();
     }
 }
