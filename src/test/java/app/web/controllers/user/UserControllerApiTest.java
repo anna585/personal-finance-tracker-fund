@@ -1,6 +1,7 @@
 package app.web.controllers.user;
 
 import app.services.user.UserService;
+import app.web.dto.transaction.TransactionDto;
 import app.web.dto.user.AuthenticationUserDetails;
 import app.web.dto.user.UserDto;
 import app.web.dto.user.UserProfileDto;
@@ -11,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -254,5 +256,47 @@ public class UserControllerApiTest {
                 .andExpect(view().name("profile"))
                 .andExpect(model().attributeHasErrors("userProfileDto"));
 
+    }
+
+    @Test
+    public void deleteUser_thenRedirectViewAdminUsersAndStatusIs3xx() throws Exception{
+
+        AuthenticationUserDetails user = getUserAdminDto();
+
+        MockHttpServletRequestBuilder requestMock = MockMvcRequestBuilders.post("/users/{id}/delete", user.getId())
+                .with(user(user))
+                .with(csrf());
+
+        mockMvc.perform(requestMock)
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/users?delete"));
+
+        verify(userService).deleteUser(eq(user.getId()));
+    }
+
+    @Test
+    public void getLogin_thenViewLoginAndStatusIs2xx() throws Exception{
+        AuthenticationUserDetails user = getUserAdminDto();
+
+        MockHttpServletRequestBuilder requestBuilder = get("/login")
+                .with(user(user));
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"))
+                .andExpect(model().attributeExists("userLoginRequest"));
+    }
+
+    @Test
+    public void getLogin_whenRequestIsWrong_thenViewLoginWithErrorMessageAndStatusIs2xx() throws Exception{
+
+        MockHttpServletRequestBuilder requestBuilder = get("/login")
+                .formField("error", "true");
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"))
+                .andExpect(model().attribute("error", "Invalid username or password."))
+                .andExpect(model().attributeExists("userLoginRequest"));
     }
 }
