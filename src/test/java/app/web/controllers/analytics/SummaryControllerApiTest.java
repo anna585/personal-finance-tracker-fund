@@ -57,7 +57,7 @@ public class SummaryControllerApiTest {
                 .monthlyBalance(BigDecimal.valueOf(500.00))
                 .monthlyIncome(BigDecimal.valueOf(1500.00))
                 .monthlyExpense(BigDecimal.valueOf(1000.00))
-                .monthlySavingRade(BigDecimal.valueOf(20))
+                .monthlySavingRate(BigDecimal.valueOf(20))
                 .build();
 
         TransactionDto transactionDto = getTransactionDto();

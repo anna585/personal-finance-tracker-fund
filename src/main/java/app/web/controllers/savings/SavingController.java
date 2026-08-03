@@ -74,7 +74,7 @@ public class SavingController {
 
         savingService.createGoal(user.getId(), savingRequest);
 
-        return new ModelAndView("redirect:/savings?success)")
+        return new ModelAndView("redirect:/savings?success")
                 .addObject("savingRequest", savingRequest);
     }
 
@@ -82,7 +82,7 @@ public class SavingController {
     public ModelAndView deleteSavingGoal(@PathVariable UUID id){
 
         savingService.deleteSavingGoal(id);
-        return new ModelAndView("redirect:/savings");
+        return new ModelAndView("redirect:/savings?delete");
 
     }
 
@@ -117,6 +117,6 @@ public class SavingController {
 
         savingService.updateSavingGoal(id, editSavingRequest);
 
-        return new ModelAndView("redirect:/savings");
+        return new ModelAndView("redirect:/savings?update");
     }
 }

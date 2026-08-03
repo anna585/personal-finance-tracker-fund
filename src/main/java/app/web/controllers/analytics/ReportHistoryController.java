@@ -35,7 +35,7 @@ public class ReportHistoryController {
     public ModelAndView deleteReport(@PathVariable UUID reportId){
 
         reportService.deleteReport(reportId);
-        return new ModelAndView("redirect:/report-history");
+        return new ModelAndView("redirect:/report-history?delete");
 
     }
 }

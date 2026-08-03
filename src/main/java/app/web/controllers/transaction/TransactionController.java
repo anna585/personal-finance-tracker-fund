@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.UUID;
 
@@ -58,7 +59,8 @@ public class TransactionController {
     @PostMapping("/add")
     public ModelAndView postTransaction(@Valid @ModelAttribute TransactionRequest transactionRequest,
                                         BindingResult bindingResult,
-                                        @AuthenticationPrincipal AuthenticationUserDetails principal){
+                                        @AuthenticationPrincipal AuthenticationUserDetails principal,
+                                        RedirectAttributes redirectAttributes){
         UserDto user = userService.getById(principal.getId());
 
         if(bindingResult.hasErrors()){
@@ -69,6 +71,9 @@ public class TransactionController {
         }
 
             transactionService.createNewTransaction(user.getId(), transactionRequest);
+            redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Transaction added successfully.");
             return new ModelAndView("redirect:/transactions?success");
 
     }
@@ -78,7 +83,7 @@ public class TransactionController {
     public ModelAndView deleteTransaction(@PathVariable UUID id){
 
         transactionService.deleteTransaction(id);
-        return new ModelAndView("redirect:/transactions");
+        return new ModelAndView("redirect:/transactions?delete");
 
     }
 
@@ -99,7 +104,7 @@ public class TransactionController {
     }
 
     @PostMapping("/{id}/edit")
-    public ModelAndView getEditTransaction(
+    public ModelAndView postEditTransaction(
             @PathVariable UUID id,
             @Valid @ModelAttribute TransactionRequest transactionRequest,
             BindingResult bindingResult){
@@ -112,6 +117,6 @@ public class TransactionController {
 
         transactionService.updateTransaction(id, transactionRequest);
 
-        return new ModelAndView("redirect:/transactions");
+        return new ModelAndView("redirect:/transactions?update");
     }
 }

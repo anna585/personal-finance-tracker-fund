@@ -9,7 +9,7 @@ import app.web.dto.budget.BudgetDto;
 import app.web.dto.saving.SavingGoalsDto;
 import app.web.dto.transaction.TransactionDto;
 import app.web.dto.user.UserDto;
-import app.web.dto.user.UsersDetails;
+import app.web.dto.user.UsersDetailLists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -65,7 +65,7 @@ public class StatisticsServiceUTest {
         budgetDtoList.add(budgetDto);
         budgetDtoList.add(budgetDto);
 
-        UsersDetails usersDetails = UsersDetails.builder()
+        UsersDetailLists usersDetailLists = UsersDetailLists.builder()
                 .users(listUser)
                 .saving(goalsDtoList)
                 .transactions(transactionDtos)
@@ -78,15 +78,15 @@ public class StatisticsServiceUTest {
                 .totalSavings(1)
                 .totalTransactions(4)
                 .build();
-        when(userService.getAllUsersDetails()).thenReturn(usersDetails);
-        when(client.postStatisticForAllUsers(usersDetails))
+        when(userService.getAllUsersDetails()).thenReturn(usersDetailLists);
+        when(client.postStatisticForAllUsers(usersDetailLists))
                 .thenReturn(expectedResponse);
         StatisticResponse result = statisticService.getAllUsersForStatistic();
 
         assertEquals(expectedResponse, result);
 
         verify(userService).getAllUsersDetails();
-        verify(client).postStatisticForAllUsers(usersDetails);
+        verify(client).postStatisticForAllUsers(usersDetailLists);
         verifyNoMoreInteractions(userService, client);
 
 

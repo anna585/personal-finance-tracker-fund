@@ -188,7 +188,7 @@ public class TransactionControllerApiTest {
 
         mockMvc.perform(requestMock)
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/transactions"));
+                .andExpect(redirectedUrl("/transactions?update"));
 
         verify(transactionService).updateTransaction(eq(transactionDto.getId()) , any(TransactionRequest.class));
     }
@@ -226,7 +226,7 @@ public class TransactionControllerApiTest {
 
         mockMvc.perform(requestMock)
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/transactions"));
+                .andExpect(redirectedUrl("/transactions?delete"));
 
         verify(transactionService).deleteTransaction(eq(transactionDto.getId()));
     }

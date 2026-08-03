@@ -12,5 +12,5 @@ public class SummaryResponse {
     private BigDecimal monthlyIncome;
     private BigDecimal monthlyExpense;
     private BigDecimal monthlyBalance;
-    private BigDecimal monthlySavingRade;
+    private BigDecimal monthlySavingRate;
 }

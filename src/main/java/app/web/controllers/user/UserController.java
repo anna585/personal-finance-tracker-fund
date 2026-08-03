@@ -70,7 +70,7 @@ public class  UserController {
     public ModelAndView deleteUser(@PathVariable UUID id){
 
             userService.deleteUser(id);
-            return new ModelAndView("redirect:/admin/users");
+            return new ModelAndView("redirect:/admin/users?delete");
 
     }
 
