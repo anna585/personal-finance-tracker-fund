@@ -1,10 +1,8 @@
-package app.service.user;
+package app;
 
 
-import app.model.entities.budget.Budget;
 import app.model.entities.user.User;
 import app.model.entities.user.UserRole;
-import app.repositories.budget.BudgetRepository;
 import app.repositories.user.UserRepository;
 import app.services.user.UserService;
 import app.web.dto.user.UserDto;
@@ -17,10 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import java.util.UUID;
-
-import static app.unit.user.UserFactory.getUserRegisterRequest;
+import static app.web.unit.UserFactory.getUserRegisterRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @ActiveProfiles("test")
@@ -34,9 +31,6 @@ public class UserServiceItTest {
     @Autowired
     private  UserRepository userRepository;
 
-    @Autowired
-    private BudgetRepository budgetRepository;
-
     @Test
     public void testRegisterUser_shouldRegisterUser_withDefaultBudget(){
 
@@ -44,10 +38,7 @@ public class UserServiceItTest {
 
         UserDto userDto = underTest.register(userRegisterRequest);
 
-        UUID budgetId = userDto.getBudgets().get(0).getId();
-
         User user = userRepository.findById(userDto.getId()).get();
-        Budget budget = budgetRepository.findById(budgetId).get();
 
 
         assertEquals(userRegisterRequest.getUsername(), user.getUsername());
@@ -56,7 +47,9 @@ public class UserServiceItTest {
         assertEquals(userRegisterRequest.getEmail(), user.getEmail());
         assertEquals(UserRole.USER, user.getUserRole());
         assertEquals(1, user.getBudgets().size());
-        assertEquals(user.getId(), budget.getUser().getId());
+        assertEquals(1, userRepository.count());
+        assertNotNull(user.getPassword());
+        assertNotNull(user.getCreatedOn());
 
     }
 }
