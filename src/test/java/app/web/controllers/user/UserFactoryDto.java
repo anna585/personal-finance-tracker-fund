@@ -1,7 +1,7 @@
-package app.unit.user;
+package app.web.controllers.user;
 
-import app.model.entities.user.UserRole;
 import app.model.entities.user.User;
+import app.model.entities.user.UserRole;
 import app.web.dto.user.AuthenticationUserDetails;
 import app.web.dto.user.UserDto;
 import lombok.experimental.UtilityClass;
@@ -32,6 +32,19 @@ public class UserFactoryDto {
                 .id(UUID.randomUUID())
                 .username("AdminUser")
                 .role(UserRole.ADMIN)
+                .build();
+    }
+
+    public static User getUser() {
+
+        return User.builder()
+                .id(UUID.randomUUID())
+                .firstName("Anna")
+                .lastName("Angova")
+                .email("ani@abv.bg")
+                .userRole(UserRole.USER)
+                .updatedOn(LocalDateTime.now())
+                .createdOn(LocalDateTime.now())
                 .build();
     }
 }
