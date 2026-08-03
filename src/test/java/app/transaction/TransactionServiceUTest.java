@@ -25,6 +25,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -60,6 +62,11 @@ public class TransactionServiceUTest {
 
         LocalDateTime dateTime = LocalDateTime.now();
 
+        YearMonth currentMonth = YearMonth.now();
+
+        LocalDateTime start = currentMonth.atDay(1).atStartOfDay();
+        LocalDateTime end = currentMonth.atEndOfMonth().atTime(LocalTime.MAX);
+
         User user = User.builder()
                 .id(UUID.randomUUID())
                 .build();
@@ -79,7 +86,7 @@ public class TransactionServiceUTest {
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(budgetRepository.findByUserAndMonthAndYear(user, dateTime.getMonth(), dateTime.getYear())).thenReturn(Optional.of(budget));
-        when(transactionRepository.findTotalSpentByUser(user.getId())).thenReturn(BigDecimal.ZERO);
+        when(transactionRepository.findTotalSpentByUser(user.getId(), start, end)).thenReturn(BigDecimal.ZERO);
 
         transactionService.createNewTransaction(user.getId(), transactionRequest);
 
@@ -98,6 +105,11 @@ public class TransactionServiceUTest {
     @Test
     public void createTransaction_whenBudgetIsNotEnoughAndTransactionTypeIsExpense_thenThrowBudgetNotEnoughException(){
         LocalDateTime dateTime = LocalDateTime.now();
+
+        YearMonth currentMonth = YearMonth.now();
+
+        LocalDateTime start = currentMonth.atDay(1).atStartOfDay();
+        LocalDateTime end = currentMonth.atEndOfMonth().atTime(LocalTime.MAX);
 
         User user = User.builder()
                 .id(UUID.randomUUID())
@@ -118,7 +130,7 @@ public class TransactionServiceUTest {
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(budgetRepository.findByUserAndMonthAndYear(user, dateTime.getMonth(), dateTime.getYear())).thenReturn(Optional.of(budget));
-        when(transactionRepository.findTotalSpentByUser(user.getId())).thenReturn(BigDecimal.ZERO);
+        when(transactionRepository.findTotalSpentByUser(user.getId(), start, end)).thenReturn(BigDecimal.ZERO);
 
         assertThrows(BudgetNotEnoughException.class, () -> transactionService.createNewTransaction(user.getId(), transactionRequest));
         verify(transactionRepository, never()).save(any(Transaction.class));
@@ -128,6 +140,10 @@ public class TransactionServiceUTest {
     @Test
     public void createTransaction_whenBudgetIsNotEnoughAndTransactionTypeIsIncome_thenTransactionInSuccessRecord(){
         LocalDateTime dateTime = LocalDateTime.now();
+        YearMonth currentMonth = YearMonth.now();
+
+        LocalDateTime start = currentMonth.atDay(1).atStartOfDay();
+        LocalDateTime end = currentMonth.atEndOfMonth().atTime(LocalTime.MAX);
 
         User user = User.builder()
                 .id(UUID.randomUUID())
@@ -148,7 +164,7 @@ public class TransactionServiceUTest {
 
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(budgetRepository.findByUserAndMonthAndYear(user, dateTime.getMonth(), dateTime.getYear())).thenReturn(Optional.of(budget));
-        when(transactionRepository.findTotalSpentByUser(user.getId())).thenReturn(BigDecimal.ZERO);
+        when(transactionRepository.findTotalSpentByUser(user.getId(), start, end)).thenReturn(BigDecimal.ZERO);
 
         transactionService.createNewTransaction(user.getId(), transactionRequest);
 
@@ -189,19 +205,28 @@ public class TransactionServiceUTest {
 
     @Test
     public void getTotalSpent_whenTransactionRepositoryIsNull_thenTotalSpentIsZero(){
+        YearMonth currentMonth = YearMonth.now();
+
+        LocalDateTime start = currentMonth.atDay(1).atStartOfDay();
+        LocalDateTime end = currentMonth.atEndOfMonth().atTime(LocalTime.MAX);
 
         User user = User.builder()
                 .id(UUID.randomUUID())
                 .build();
 
-        when(transactionRepository.findTotalSpentByUser(user.getId())).thenReturn(null);
+        when(transactionRepository.findTotalSpentByUser(user.getId(), start, end)).thenReturn(null);
 
-        assertEquals(BigDecimal.ZERO, transactionService.getTotalSpentByUser(user));
-        verify(transactionRepository).findTotalSpentByUser(user.getId());
+        assertEquals(null, transactionService.getTotalSpentByUser(user));
+        verify(transactionRepository).findTotalSpentByUser(user.getId(), start, end);
     }
 
     @Test
     public void getTotalSpent_whenTransactionRepositoryIsNotNull_thenResultIsPositive(){
+
+        YearMonth currentMonth = YearMonth.now();
+
+        LocalDateTime start = currentMonth.atDay(1).atStartOfDay();
+        LocalDateTime end = currentMonth.atEndOfMonth().atTime(LocalTime.MAX);
 
         User user = User.builder()
                 .id(UUID.randomUUID())
@@ -216,7 +241,7 @@ public class TransactionServiceUTest {
         List<Transaction> transactions = List.of(transaction, transaction, transaction);
         user.setTransactions(transactions);
 
-        when(transactionRepository.findTotalSpentByUser(user.getId())).thenReturn(BigDecimal.valueOf(300.00));
+        when(transactionRepository.findTotalSpentByUser(user.getId(), start, end)).thenReturn(BigDecimal.valueOf(300.00));
 
         assertEquals(BigDecimal.valueOf(300.00), transactionService.getTotalSpentByUser(user));
     }

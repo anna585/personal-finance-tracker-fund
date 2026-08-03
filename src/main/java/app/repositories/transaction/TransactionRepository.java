@@ -18,8 +18,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
         FROM Transaction t
         WHERE t.user.id = :userId
         AND t.type = 'EXPENSE'
+        AND t.createdAt BETWEEN :start AND :end
         """)
-    BigDecimal findTotalSpentByUser(UUID userId);
+    BigDecimal findTotalSpentByUser(UUID userId,  LocalDateTime start, LocalDateTime end);
 
     List<Transaction> findAllByUserIdOrderByCreatedAtDesc(UUID id);
 
