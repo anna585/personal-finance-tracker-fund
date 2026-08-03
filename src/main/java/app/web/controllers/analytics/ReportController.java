@@ -70,7 +70,9 @@ public class ReportController {
 
         return  new ModelAndView("budget-reports")
                 .addObject("request", request)
-                .addObject("report", report);
+                .addObject("report", report)
+                .addObject("successMessage",
+                        "✔\uFE0F Report generated successfully.");
     }
 
 }
