@@ -10,6 +10,7 @@ import app.services.transaction.TransactionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,6 +26,7 @@ public class BudgetService {
     private final TransactionService transactionService;
 
 
+    @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
     public Budget createDefaultBudget(User user){
 
@@ -87,6 +89,7 @@ public class BudgetService {
         return budgetRepository.findAll();
     }
 
+    @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
     public Budget createBudgetForCurrentMonth(User user, LocalDateTime now) {
 
