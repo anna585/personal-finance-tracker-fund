@@ -103,10 +103,11 @@ public class SavingControllerApiTest {
         AuthenticationUserDetails user = getUserAdminDto();
         UserDto userDto = getUserDto();
         SavingRequest savingRequest = SavingRequest.builder().build();
+        SavingGoalsDto savingGoalsDto = SavingGoalsDto.builder().build();
 
 
         when(userService.getById(user.getId())).thenReturn(userDto);
-        when(savingService.createGoal(user.getId(), savingRequest)).thenReturn(userDto);
+        when(savingService.createGoal(user.getId(), savingRequest)).thenReturn(savingGoalsDto);
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/savings/add")
                 .with(user(user))
@@ -130,10 +131,11 @@ public class SavingControllerApiTest {
         AuthenticationUserDetails user = getUserAdminDto();
         UserDto userDto = getUserDto();
         SavingRequest savingRequest = SavingRequest.builder().build();
+        SavingGoalsDto savingGoalsDto = SavingGoalsDto.builder().build();
 
 
         when(userService.getById(user.getId())).thenReturn(userDto);
-        when(savingService.createGoal(user.getId(), savingRequest)).thenReturn(userDto);
+        when(savingService.createGoal(user.getId(), savingRequest)).thenReturn(savingGoalsDto);
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/savings/add")
                 .with(user(user))
@@ -193,7 +195,7 @@ public class SavingControllerApiTest {
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/savings"));
+                .andExpect(redirectedUrl("/savings?update"));
 
         verify(savingService).updateSavingGoal(eq(goalsDto.getId()), any(EditSavingRequest.class));
     }
@@ -232,7 +234,7 @@ public class SavingControllerApiTest {
 
         mockMvc.perform(requestMock)
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/savings"));
+                .andExpect(redirectedUrl("/savings?delete"));
 
         verify(savingService).deleteSavingGoal(eq(goalsDto.getId()));
     }
