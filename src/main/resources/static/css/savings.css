@@ -122,10 +122,20 @@ body {
     font-weight: bold;
 }
 
-.success-message {
+.success-message, .update-message{
     color: #0bb610;
-    font-size: 14px;
+    font-size: 16px;
     margin-top: 5px;
-    font-weight: 500;
+    font-weight: 700;
     font-style: italic;
+    text-align: center;
+}
+
+.delete-message {
+    color: #f32040;
+    font-size: 16px;
+    margin-top: 5px;
+    font-weight: 700;
+    font-style: italic;
+    text-align: center;
 }

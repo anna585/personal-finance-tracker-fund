@@ -116,17 +116,6 @@ thead{
     font-weight:bold;
 }
 
-.success-message {
-    background-color: #ffe6e6;
-    color: #00ff04;
-    border: 1px solid #17d343;
-    padding: 12px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: bold;
-}
-
 .error {
     background-color: #ffe6e6;
     color: #d32f2f;
@@ -136,4 +125,22 @@ thead{
     border-radius: 8px;
     text-align: center;
     font-weight: bold;
+}
+
+.success-message, .update-message{
+    color: #0bb610;
+    font-size: 16px;
+    margin-top: 5px;
+    font-weight: 700;
+    font-style: italic;
+    text-align: center;
+}
+
+.delete-message {
+    color: #f32040;
+    font-size: 16px;
+    margin-top: 5px;
+    font-weight: 700;
+    font-style: italic;
+    text-align: center;
 }

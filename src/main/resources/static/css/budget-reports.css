@@ -80,3 +80,20 @@ h2{
 
     margin-bottom:0;
 }
+.success-message{
+    color: #0bb610;
+    font-size: 16px;
+    margin-top: 5px;
+    font-weight: 700;
+    font-style: italic;
+    text-align: center;
+}
+
+.delete-message {
+    color: #f32040;
+    font-size: 16px;
+    margin-top: 5px;
+    font-weight: 700;
+    font-style: italic;
+    text-align: center;
+}
