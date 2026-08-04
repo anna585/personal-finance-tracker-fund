@@ -86,7 +86,7 @@ public class ReportHistoryApiTest {
 
         mockMvc.perform(requestMock)
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/report-history"));
+                .andExpect(redirectedUrl("/report-history?delete"));
 
         verify(reportService).deleteReport(eq(reportId));
     }
