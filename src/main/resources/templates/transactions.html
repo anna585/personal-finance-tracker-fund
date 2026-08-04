@@ -18,6 +18,7 @@
             <a href="/budget">Budget</a>
             <a href="/savings">Savings</a>
             <a href="/report-history">Report History</a>
+            <a href="/profile">Profile</a>
             <div sec:authorize="hasRole('ROLE_ADMIN')">
                 <a href="/admin/users">Users</a>
                 <span> | </span>
@@ -39,10 +40,9 @@
 
     <section class="transactions-table">
 
-        <div class="success-message" th:if="${param.success}">
-            <p>Transaction saved successfully!</p>
-        </div>
-
+        <p class="success-message" th:if="${param.success}"> ✔️ Transaction added successfully.</p>
+        <p class="update-message" th:if="${param.update}"> ✔️ Transaction updated successfully.</p>
+        <p class="delete-message" th:if="${param.delete}"> 🗑️ Transaction deleted successfully.</p>
         <div th:if="${error}" class="error">
             <p th:text="${error}"></p>
         </div>
@@ -87,6 +87,26 @@
                     </div>
                 </td>
             </tr>
+
+<!--            <div class="toast-container position-fixed top-0 end-0 p-3"-->
+<!--                 th:if="${successMessage}">-->
+
+<!--                <div id="successToast" class="custom-toast">-->
+
+<!--                    <div class="toast-content">-->
+<!--                        <i class="bi bi-check-circle-fill"></i>-->
+<!--                        <span th:text="${successMessage}"></span>-->
+<!--                    </div>-->
+
+<!--                    <button type="button"-->
+<!--                            class="toast-close"-->
+<!--                            data-bs-dismiss="toast">-->
+<!--                        ×-->
+<!--                    </button>-->
+
+<!--                </div>-->
+
+<!--            </div>-->
 
             </tbody>
 

@@ -19,6 +19,7 @@
             <a href="/budget">Budget</a>
             <a href="/savings">Savings</a>
             <a href="/report-history">Report History</a>
+            <a href="/profile">Profile</a>
             <div sec:authorize="hasRole('ROLE_ADMIN')">
                 <a href="/admin/users">Users</a>
                 <span> | </span>
@@ -36,10 +37,10 @@
         <h2 class="profile-title">
             Customer Profile
         </h2>
-        <p class="success-message" th:if="${param.success}"> Profile information updated successfully.</p>
+        <p class="success-message" th:if="${param.success}"> ✔️ Profile updated successfully.</p>
 
 
-        <form th:action="@{/admin/users/{id}/update-role(id=${user.id})}"
+        <form th:action="@{/admin/users/{id}/update-role(id=${updateUserRoleDto.id})}"
               th:object="${updateUserRoleDto}"
               th:method="post" onsubmit="return confirm('Are you sure that you want to change the profile information?')">
 

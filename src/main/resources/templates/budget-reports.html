@@ -19,6 +19,7 @@
             <a href="/budget">Budget</a>
             <a href="/savings">Savings</a>
             <a href="/report-history">Report History</a>
+            <a href="/profile">Profile</a>
             <div sec:authorize="hasRole('ROLE_ADMIN')">
                 <a href="/admin/users">Users</a>
                 <span> | </span>
@@ -34,6 +35,11 @@
     <h2 class="text-center mb-4">
         📊 Financial Reports
     </h2>
+
+    <div class="success-message"
+         th:if="${successMessage}"
+         th:text="${successMessage}">
+    </div>
 
     <div class="card shadow-lg border-0">
 

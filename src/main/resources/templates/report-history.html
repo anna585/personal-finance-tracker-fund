@@ -22,6 +22,7 @@
             <a href="/budget">Budget</a>
             <a href="/savings">Savings</a>
             <a href="/report-history">Report History</a>
+            <a href="/profile">Profile</a>
             <div sec:authorize="hasRole('ROLE_ADMIN')">
                 <a href="/admin/users">Users</a>
                 <span> | </span>
@@ -37,6 +38,7 @@
     <div class="text-center mb-5">
         <h2 class="fw-bold">Report History</h2>
         <p class="text-muted">Previously generated monthly reports</p>
+        <p class="delete-message" th:if="${param.delete}"> 🗑️ Report deleted successfully.</p>
     </div>
 
     <div class="card shadow-sm border-0">

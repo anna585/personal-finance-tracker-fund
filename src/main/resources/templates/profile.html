@@ -19,6 +19,7 @@
             <a href="/budget">Budget</a>
             <a href="/savings">Savings</a>
             <a href="/report-history">Report History</a>
+            <a href="/profile">Profile</a>
             <div sec:authorize="hasRole('ROLE_ADMIN')">
                 <a href="/admin/users">Users</a>
                 <span> | </span>
@@ -34,13 +35,13 @@
     <div class="profile-card">
 
         <div class="profile-avatar"
-              th:text="${user.username.substring(0,1).toUpperCase()}">
+             th:text="${userProfileDto != null && userProfileDto.username != null ? #strings.toUpperCase(#strings.substring(userProfileDto.username,0,1)) : '?'}">
         </div>
-
 
         <h2 class="profile-title">
             My Profile
         </h2>
+        <p class="success-message" th:if="${param.success}"> ✔️ Profile information changed successfully.</p>
 
 
         <form th:action="@{/profile}"
@@ -83,18 +84,13 @@
             <button class="profile-button" type="submit">
                 Save changes
             </button>
-            <p class="success-message" th:if="${param.success}"> Profile information updated successfully.</p>
 
         </form>
 
         <div class="profile-role">
             Role:
-            <span th:classappend="${user.userRole == 'ADMIN'} ? 'role-admin' : 'role-user'"
-                  th:text="${user.userRole}">
-            </span>
+            <span th:text="${user.userRole}"></span>
         </div>
-
-
     </div>
 
 </div>

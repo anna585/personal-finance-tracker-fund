@@ -17,6 +17,7 @@
             <a href="/budget">Budget</a>
             <a href="/savings">Savings</a>
             <a href="/report-history">Report History</a>
+            <a href="/profile">Profile</a>
             <div sec:authorize="hasRole('ROLE_ADMIN')">
                 <a href="/admin/users">Users</a>
                 <span> | </span>
@@ -31,8 +32,8 @@
 
     <section class="budget-header">
         <h1>Monthly Budget</h1>
-        <span th:text="${budget.month}"></span>
-        <span th:text="' ' + ${budget.year}"></span>
+        <span th:text="${budget.month != null ? budget.month : ''}"></span>
+        <span th:text="' ' + ${budget.year != null ? budget.year : ''}"></span>
     </section>
 
     <section class="budget-cards">
@@ -68,7 +69,7 @@
             <button type="submit">
                 Save Budget
             </button>
-            <p class="success-message" th:if="${param.success}"> Budget saved successfully.</p>
+            <p class="success-message" th:if="${param.success}"> ✔️ Budget updated successfully.</p>
 
         </form>
 

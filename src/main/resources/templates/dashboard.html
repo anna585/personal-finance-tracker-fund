@@ -33,7 +33,7 @@
 <main>
 
     <section class="welcome-section">
-        <h1>Welcome back,</h1>
+        <h1>Welcome back</h1>
         <h1 th:text="${user.firstName}"></h1>
         <p>Current Month Summary</p>
         <span th:text="${date.month}"></span>
@@ -63,7 +63,7 @@
 
         <div class="card saving-card">
             <h3>Saving Rate</h3>
-            <span class="amount" th:text=" ${summary.monthlySavingRade} + ' %'"></span>
+            <span class="amount" th:text=" ${summary.monthlySavingRate} + ' %'"></span>
         </div>
 
     </section>

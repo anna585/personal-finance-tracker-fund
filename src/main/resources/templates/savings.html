@@ -17,6 +17,7 @@
             <a href="/budget">Budget</a>
             <a href="/savings">Savings</a>
             <a href="/report-history">Report History</a>
+            <a href="/profile">Profile</a>
             <div sec:authorize="hasRole('ROLE_ADMIN')">
                 <a href="/admin/users">Users</a>
                 <span> | </span>
@@ -31,12 +32,13 @@
 
     <section class="page-header">
         <h1>Saving Goals</h1>
-
+        <p class="success-message" th:if="${param.success}"> ✔️ Saving goal created successfully.</p>
+        <p class="update-message" th:if="${param.update}"> ✔️ Saving goal updated successfully.</p>
+        <p class="delete-message" th:if="${param.delete}"> 🗑️ Saving goal deleted successfully.</p>
         <a href="/savings/add" class="btn-add">
             + Add Goal
         </a>
     </section>
-
     <section class="goals-container">
 
         <div th:if="${errorMessage}" class="error">
