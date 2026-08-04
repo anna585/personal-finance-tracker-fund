@@ -161,6 +161,10 @@ public class UserService implements UserDetailsService {
     public UserDto updateRole(UUID id, @Valid UpdateUserRoleDto updateUserRoleDto) {
 
         User user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException(id));
+
+        if (id.equals(user.getId())) {
+            throw new AccessDeniedException();
+        }
         
         user.setUserRole(updateUserRoleDto.getRole());
         
