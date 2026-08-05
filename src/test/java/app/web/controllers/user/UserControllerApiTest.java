@@ -1,7 +1,6 @@
 package app.web.controllers.user;
 
 import app.services.user.UserService;
-import app.web.dto.transaction.TransactionDto;
 import app.web.dto.user.AuthenticationUserDetails;
 import app.web.dto.user.UserDto;
 import app.web.dto.user.UserProfileDto;
@@ -68,7 +67,7 @@ public class UserControllerApiTest {
 
         mockMvc.perform(request)
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/login"));
+                .andExpect(redirectedUrl("/login?success"));
         verify(userService).register(any());
 
     }
