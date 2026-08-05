@@ -4,7 +4,7 @@
 
 - **Main Application:** https://github.com/anna585/personal-finance-tracker-fund
 - **REST Microservice:** https://github.com/anna585/budget-analytics-svc
-- 
+
 ## Overview
 
 Personal Finance Tracker is a full-stack Spring Boot web application that helps users manage their personal finances by tracking income and expenses, creating monthly budgets, monitoring saving goals, and generating financial reports.
@@ -227,6 +227,32 @@ The application supports two user roles:
 http://localhost:8080
 ```
 
+## Screenshots
+
+- Login
+
+![img.png](img.png)
+
+- Dashboard
+
+![img_1.png](img_1.png)
+
+- Budget
+
+![img_2.png](img_2.png)
+
+- Transactions
+
+![img_3.png](img_3.png)
+
+- Saving Goals
+
+![img_4.png](img_4.png)
+
+- Report History
+
+![img_5.png](img_5.png)
+
 ---
 
 ## Future Improvements
@@ -239,32 +265,6 @@ http://localhost:8080
 - CI/CD pipeline
 
 ---
-
-## Screenshots
-
-*Login
-
-![img.png](img.png)
-
-*Dashboard
-
-![img_1.png](img_1.png)
-
-*Budget
-
-![img_2.png](img_2.png)
-
-*Transactions
-
-![img_3.png](img_3.png)
-
-*Saving Goals
-
-![img_4.png](img_4.png)
-
-*Report History
-
-![img_5.png](img_5.png)
 
 ## Author
 
