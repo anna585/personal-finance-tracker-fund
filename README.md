@@ -1,10 +1,15 @@
 # Personal Finance Tracker
 
+## Repositories
+
+- **Main Application:** https://github.com/anna585/personal-finance-tracker-fund
+- **REST Microservice:** https://github.com/anna585/budget-analytics-svc
+- 
 ## Overview
 
-Personal Finance Tracker is a web application built with Spring Boot that helps users manage their personal finances. The application allows users to track income and expenses, create monthly budgets, and monitor saving goals in a simple and intuitive dashboard.
-
-The project was developed as part of the Spring Fundamentals course.
+Personal Finance Tracker is a full-stack Spring Boot web application that helps users manage their personal finances by tracking income and expenses, creating monthly budgets, monitoring saving goals, and generating financial reports.
+The application integrates with a separate REST Analytics microservice responsible for generating dashboard summaries, reports, and user statistics.
+The project was developed as part of the Spring Advanced course.
 
 ---
 
@@ -18,8 +23,9 @@ The project was developed as part of the Spring Fundamentals course.
 ### Transactions
 
 * Add new transactions
-* View transaction history
+* Edit transactions
 * Delete transactions
+* View transaction history
 * Categorize transactions as income or expense
 
 ### Budget Management
@@ -39,7 +45,7 @@ The project was developed as part of the Spring Fundamentals course.
 * Current balance overview
 * Monthly income summary
 * Monthly expense summary
-* Remaining budget calculation
+* Saving rate in percents
 * Recent transactions overview
 
 ### Administration
@@ -54,11 +60,25 @@ The project was developed as part of the Spring Fundamentals course.
 
 ### Backend
 
-* Java 22
-* Spring Boot 3
-* Spring MVC
-* Spring Data JPA
-* Hibernate
+- Java 17
+- Spring Boot
+- Spring MVC
+- Spring Security
+- Spring Data JPA
+- Hibernate
+- Spring Scheduling
+- Spring Cache
+- Spring AOP
+- OpenFeign
+- Lombok
+
+### Testing
+
+- JUnit 5
+- Mockito
+- Spring Boot Test
+- MockMvc
+- H2 Database
 
 ### Frontend
 
@@ -74,9 +94,63 @@ The project was developed as part of the Spring Fundamentals course.
 
 * Maven
 
+## REST Microservice
+
+This project uses a separate REST microservice responsible for analytics and reporting.
+The REST microservice communicates with the main application through Spring OpenFeign and is responsible for performing analytical calculations.
+
+The microservice provides:
+- Monthly dashboard summary generation
+- User statistics calculation
+- Report generation based on transactions
+- REST API endpoints consumed via OpenFeign
+
+### Technologies
+- Java
+- Spring Boot
+- Spring Web
+- Spring Data JPA
+- Spring Cache
+- Spring Scheduling
+
+### Repository
+
+You can find the REST microservice here:
+
+👉 https://github.com/anna585/budget-analytics-svc
+
 ---
 
-## Database Structure
+## Project Structure
+
+```
+Personal Finance Tracker
+│
+├── Main Application
+│   ├── User Management
+│   ├── Transactions
+│   ├── Budgets
+│   ├── Saving Goals
+│   ├── Reports History
+│   ├── Profile
+│   └── Dashboard
+│
+└── Budget Analytics REST Microservice
+    ├── Monthly Summary
+    ├── Statistics
+    └── Report Analytics
+```
+
+## Communication
+
+The main application communicates with the analytics microservice using Spring OpenFeign.
+
+Available endpoints:
+- `POST /api/v1/analytics/summary`
+- `POST /api/v1/analytics/statistic`
+- `POST /api/v1/analytics/report`
+- `GET /api/v1/analytics/report-history`
+- `DELETE /api/v1/analytics/report-history/{reportId}`
 
 ### User
 
@@ -106,6 +180,10 @@ The application follows a layered architecture:
 * Entities
 * DTOs
 * Mappers
+* Security
+* Exception
+* Scheduled
+* Aspect
 
 This structure separates business logic from presentation and data access layers.
 
@@ -115,13 +193,15 @@ This structure separates business logic from presentation and data access layers
 
 ### Current Balance
 
-The current balance is calculated dynamically using:
-
+```
 Current Balance = Total Income − Total Expenses
+```
 
 ### Remaining Budget
 
+```
 Remaining Budget = Monthly Budget − Monthly Expenses
+```
 
 ### Saving Goals
 
@@ -132,20 +212,60 @@ Creates a saving financial goal by automatically adding 10% of the remaining mon
 The application supports two user roles:
 
 - USER – manages personal finances
-- ADMIN – manages users and system reports
+- ADMIN – manages users and statistic
+
+
+## Installation
+
+1. Clone both repositories.
+2. Configure MySQL.
+3. Run the REST Analytics Microservice.
+4. Run the Main Application.
+5. Open:
+
+```
+http://localhost:8080
+```
 
 ---
 
 ## Future Improvements
 
-* Transaction editing
-* Charts and financial analytics
-* Export reports to PDF
-* Email notifications
-* Spring Security authentication
+- Email notifications
+- CSV/PDF report export
+- Multi-currency support
+- Charts and financial trends
+- Docker deployment
+- CI/CD pipeline
 
 ---
 
+## Screenshots
+
+*Login
+
+![img.png](img.png)
+
+*Dashboard
+
+![img_1.png](img_1.png)
+
+*Budget
+
+![img_2.png](img_2.png)
+
+*Transactions
+
+![img_3.png](img_3.png)
+
+*Saving Goals
+
+![img_4.png](img_4.png)
+
+*Report History
+
+![img_5.png](img_5.png)
+
 ## Author
 
-Developed by Anna as a Spring Fundamentals course project.
+Developed by Anna as a Spring Advanced course project.
