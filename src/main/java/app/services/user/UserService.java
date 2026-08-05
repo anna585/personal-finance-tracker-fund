@@ -1,5 +1,6 @@
 package app.services.user;
 
+import app.aspect.LogAction;
 import app.exeption.user.*;
 import app.mapper.budget.BudgetMapper;
 import app.mapper.saving.SavingGoalsMapper;
@@ -22,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -42,6 +45,7 @@ public class UserService implements UserDetailsService {
     private final TransactionService transactionService;
     private final SavingService savingService;
 
+    @LogAction("New user registered.")
     @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
     public UserDto register(UserRegisterRequest userRegisterRequest){
@@ -69,7 +73,6 @@ public class UserService implements UserDetailsService {
         user.addBudget(budget);
 
         userRepository.save(user);
-        log.info("Registering new user with username: {}", userRegisterRequest.getUsername());
 
         return UserMapper.toUserDto(user);
     }
@@ -98,6 +101,7 @@ public class UserService implements UserDetailsService {
 
     }
 
+    @LogAction("Delete user from Admin.")
     @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
@@ -109,11 +113,11 @@ public class UserService implements UserDetailsService {
         if(UserRole.ADMIN.equals(user.getUserRole())){
             throw new AdminCannotBeDeletedException(id);
         }
-        log.info("Delete user with id {}", id);
 
         userRepository.deleteById(id);
     }
 
+    @LogAction("Updated profile information.")
     @Transactional
     public UserDto updateProfileInformation(UUID userId, @Valid UserProfileDto userProfileDto) {
         User user = userRepository.findById(userId)
@@ -135,18 +139,15 @@ public class UserService implements UserDetailsService {
         user.setEmail(userProfileDto.getEmail());
         userRepository.save(user);
 
-        log.info("Updated profile for username {}", userProfileDto.getUsername());
-
         return UserMapper.toUserDto(user);
     }
 
+    @LogAction("Loading user by username")
     @Override
     public UserDetails loadUserByUsername(String username){
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
-
-        log.info("Loading user by username: {}", username);
 
         return AuthenticationUserDetails.builder()
                 .id(user.getId())
@@ -156,21 +157,25 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
+    @LogAction("User role change from Admin.")
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public UserDto updateRole(UUID id, @Valid UpdateUserRoleDto updateUserRoleDto) {
 
         User user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException(id));
 
-        if (id.equals(user.getId())) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        AuthenticationUserDetails principal =
+                (AuthenticationUserDetails) authentication.getPrincipal();
+
+        if (principal.getId().equals(id)) {
             throw new AccessDeniedException();
         }
         
         user.setUserRole(updateUserRoleDto.getRole());
         
         userRepository.save(user);
-
-        log.info("User role for username: {} changed", user.getUsername());
         
         return UserMapper.toUserDto(user);
     }
