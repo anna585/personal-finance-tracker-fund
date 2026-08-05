@@ -1,16 +1,15 @@
 package app.services.saving;
 
+import app.aspect.LogAction;
 import app.exeption.user.InvalidUuidException;
 import app.exeption.budget.BudgetNotEnoughException;
 import app.exeption.budget.BudgetNotFoundException;
 import app.exeption.savings.SavingGoalNotFoundException;
 import app.exeption.user.*;
 import app.mapper.saving.SavingGoalsMapper;
-import app.mapper.user.UserMapper;
 import app.web.dto.saving.EditSavingRequest;
 import app.web.dto.saving.SavingGoalsDto;
 import app.web.dto.saving.SavingRequest;
-import app.web.dto.user.UserDto;
 import app.model.entities.budget.Budget;
 import app.model.entities.saving.SavingGoal;
 import app.model.entities.transaction.CategoryType;
@@ -55,6 +54,7 @@ public class SavingService {
         return SavingGoalsMapper.toDto(savingGoal);
     }
 
+    @LogAction("Delete saving goal.")
     @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
     public void deleteSavingGoal(UUID id) {
@@ -63,10 +63,9 @@ public class SavingService {
                 .orElseThrow(() -> new SavingGoalNotFoundException(id));
 
         savingRepository.delete(savingGoal);
-
-        log.info("Delete saving goal with id {}", id);
     }
 
+    @LogAction("Create saving goal")
     @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
     public SavingGoalsDto createGoal(UUID userId, @Valid SavingRequest savingRequest) {
@@ -119,8 +118,6 @@ public class SavingService {
         user.getSavingGoals().add(savingGoal);
         userRepository.save(user);
 
-        log.info("Creating saving goal with id {} and target amount {} EURO.", savingGoal.getId(), savingGoal.getTargetAmount());
-
         return SavingGoalsMapper.toDto(savingGoal);
 
     }
@@ -130,6 +127,7 @@ public class SavingService {
         return savingRepository.findAllByUserId(userId);
     }
 
+    @LogAction("Update saving goal")
     @Transactional
     public SavingGoalsDto updateSavingGoal(UUID id, EditSavingRequest editSavingRequest) {
 
@@ -150,8 +148,6 @@ public class SavingService {
         savingEntity.setCurrentAmount(editSavingRequest.getCurrentAmount());
         savingEntity.setTargetDate(editSavingRequest.getTargetDate());
         savingRepository.save(savingEntity);
-
-        log.info("Updating saving goal with name {}", editSavingRequest.getGoalName());
 
         return SavingGoalsMapper.toDto(savingEntity);
     }

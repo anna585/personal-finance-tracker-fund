@@ -1,6 +1,7 @@
 package app.services.user;
 
 
+import app.aspect.LogAction;
 import app.web.dto.user.UserRegisterRequest;
 import app.model.entities.user.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class UserInit implements CommandLineRunner {
     private final UserService userService;
 
 
+    @LogAction("Create default user with role ADMIN. ")
     @Override
     public void run(String... args) throws Exception {
 
@@ -41,8 +43,5 @@ public class UserInit implements CommandLineRunner {
                 .build();
 
         userService.register(userRegisterRequest);
-
-        log.info("Default user created with username [%s] and password [%s].".formatted(
-                userRegisterRequest.getUsername(), userRegisterRequest.getPassword()));
     }
 }

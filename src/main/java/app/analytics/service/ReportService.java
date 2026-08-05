@@ -3,6 +3,7 @@ package app.analytics.service;
 import app.analytics.client.TransactionClient;
 import app.analytics.dto.ReportRequest;
 import app.analytics.dto.ReportResponse;
+import app.aspect.LogAction;
 import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,10 @@ public class ReportService {
 
     private final TransactionClient client;
 
+    @LogAction("Generating report")
     @Cacheable("report")
     @Transactional
     public ReportResponse generateReport(ReportRequest reportRequest) {
-
-        log.info("Generating report for user {}", reportRequest.getUserId());
 
         try {
             return client.generateReport(reportRequest);
@@ -45,6 +45,7 @@ public class ReportService {
         return client.getHistory(String.valueOf(userId)).getBody();
     }
 
+    @LogAction("Report delete.")
     @CacheEvict("report")
     @Transactional
     public void deleteReport(UUID reportId) {

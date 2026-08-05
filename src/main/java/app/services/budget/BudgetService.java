@@ -1,5 +1,6 @@
 package app.services.budget;
 
+import app.aspect.LogAction;
 import app.mapper.budget.BudgetMapper;
 import app.web.dto.budget.BudgetDto;
 import app.web.dto.budget.MonthlyBudgetRequest;
@@ -26,6 +27,7 @@ public class BudgetService {
     private final TransactionService transactionService;
 
 
+    @LogAction("Create default budget.")
     @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
     public Budget createDefaultBudget(User user){
@@ -38,12 +40,10 @@ public class BudgetService {
                 .month(now.getMonth())
                 .year(now.getYear())
                 .build();
-
-        log.info("Generating budget for user {}, {} month, {} year", user, now.getMonth(), now.getYear());
-
         return budgetRepository.save(budget);
     }
 
+    @LogAction("Updating budget")
     @Transactional
     public BudgetDto updateMonthlyBudget(User user, MonthlyBudgetRequest monthlyBudgetRequest) {
 
@@ -54,7 +54,6 @@ public class BudgetService {
         budget.setMonthlyLimit(monthlyBudgetRequest.getMonthlyBudget());
 
         budgetRepository.save(budget);
-        log.info("Updating budget for user with ID: {}",user.getId());
 
         return BudgetMapper.toDto(budget);
     }
@@ -89,6 +88,7 @@ public class BudgetService {
         return budgetRepository.findAll();
     }
 
+    @LogAction("Create budget for current mount.")
     @CacheEvict(value = "statistic", allEntries = true)
     @Transactional
     public Budget createBudgetForCurrentMonth(User user, LocalDateTime now) {
@@ -104,9 +104,6 @@ public class BudgetService {
                 .orElse(BigDecimal.ZERO);
 
             budget.setMonthlyLimit(monthlyLimit);
-
-
-        log.info("Create budget for userId: {}",user.getId());
 
         return budgetRepository.save(budget);
     }

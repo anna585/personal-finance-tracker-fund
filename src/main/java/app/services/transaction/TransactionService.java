@@ -1,5 +1,6 @@
 package app.services.transaction;
 
+import app.aspect.LogAction;
 import app.exeption.budget.BudgetNotEnoughException;
 import app.exeption.budget.BudgetNotFoundException;
 import app.exeption.transaction.TransactionNotFoundException;
@@ -40,11 +41,13 @@ public class TransactionService {
     private final UserRepository userRepository;
     private final SavingRepository savingRepository;
 
+
     @Caching(evict = {
             @CacheEvict(value = "summary", key = "#id"),
             @CacheEvict(value = "statistic", allEntries = true)
     })
     @Transactional
+    @LogAction("Create transaction")
     public TransactionDto createNewTransaction(UUID id, TransactionRequest transactionRequest) {
         LocalDateTime createAt = LocalDateTime.now();
 
@@ -76,8 +79,6 @@ public class TransactionService {
 
         transactionRepository.save(transaction);
 
-        log.info("Creating transaction for user with ID: {}", user.getId());
-
         return TransactionMapper.toDto(transaction);
     }
 
@@ -100,6 +101,7 @@ public class TransactionService {
             @CacheEvict(value = "statistic", allEntries = true)
     })
     @Transactional
+    @LogAction("Delete transaction.")
     public void deleteTransaction(UUID id) {
 
         Transaction transaction = transactionRepository.findById(id)
@@ -109,8 +111,6 @@ public class TransactionService {
                 .ifPresent(savingRepository::delete);
 
         transactionRepository.delete(transaction);
-
-        log.info("Deleting transaction for user with id: {}", id);
     }
 
     public List<Transaction> getAllTransactionsByUser(UUID id) {
@@ -139,6 +139,7 @@ public class TransactionService {
 
     @CacheEvict(value = "summary", key = "#id")
     @Transactional
+    @LogAction("Update transaction.")
     public TransactionDto updateTransaction(UUID id, TransactionRequest transactionRequest) {
 
         Transaction transaction = transactionRepository.findById(id)
@@ -151,8 +152,6 @@ public class TransactionService {
 
 
         transactionRepository.save(transaction);
-
-        log.info("Updating transaction for user with id: {}", id);
 
         return TransactionMapper.toDto(transaction);
     }

@@ -11,16 +11,17 @@ import app.services.budget.BudgetService;
 import app.services.saving.SavingService;
 import app.services.transaction.TransactionService;
 import app.services.user.UserService;
-import app.web.dto.user.UpdateUserRoleDto;
-import app.web.dto.user.UserProfileDto;
-import app.web.dto.user.UserRegisterRequest;
+import app.web.dto.user.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContext;
 
 import java.util.*;
 
@@ -28,8 +29,7 @@ import static java.lang.Boolean.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceUTest {
@@ -295,22 +295,45 @@ public class UserServiceUTest {
     @Test
     public void updateRole_whenUserIsFound_thenUserRoleUpdate(){
 
-        User user = User.builder()
-                .id(UUID.randomUUID())
-                .userRole(UserRole.USER)
-                .build();
 
-        UpdateUserRoleDto updateUserRoleDto = UpdateUserRoleDto.builder()
+        UUID adminId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        AuthenticationUserDetails admin = AuthenticationUserDetails.builder()
+                .id(adminId)
+                .username("admin")
                 .role(UserRole.ADMIN)
                 .build();
 
-        when(userRepository.findById(any())).thenReturn(Optional.of(user));
-        userService.updateRole(user.getId(), updateUserRoleDto);
+        User user = User.builder()
+                .id(userId)
+                .userRole(UserRole.USER)
+                .build();
+
+        UpdateUserRoleDto dto = UpdateUserRoleDto.builder()
+                .role(UserRole.ADMIN)
+                .build();
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(admin);
+
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        UserDto result = userService.updateRole(userId, dto);
 
         assertEquals(UserRole.ADMIN, user.getUserRole());
+        assertEquals(UserRole.ADMIN, result.getUserRole());
 
-        verify(userRepository).findById(user.getId());
+        verify(userRepository).findById(userId);
         verify(userRepository).save(user);
+
+        SecurityContextHolder.clearContext();
     }
 
     @Test
