@@ -54,7 +54,7 @@ public class  UserController {
         }
 
             userService.register(userRegisterRequest);
-            return new ModelAndView("redirect:/login");
+            return new ModelAndView("redirect:/login?success");
     }
 
     @PreAuthorize("hasRole('ADMIN')")
