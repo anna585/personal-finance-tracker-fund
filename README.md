@@ -117,7 +117,7 @@ The microservice provides:
 
 You can find the REST microservice here:
 
-👉 https://github.com/anna585/budget-analytics-svc
+👉 https://github.com/anna585/budget-analytics-svc.git
 
 ---
 
@@ -213,6 +213,11 @@ The application supports two user roles:
 
 - USER – manages personal finances
 - ADMIN – manages users and statistic
+
+### Spring AOP
+- Implemented a custom `@LogAction` annotation.
+- Uses `@Before` advice to log application actions before annotated methods are executed.
+- Centralizes logging as a cross-cutting concern and keeps service classes clean.
 
 
 ## Installation
